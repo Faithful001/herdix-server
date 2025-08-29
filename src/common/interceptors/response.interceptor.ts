@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiResponse } from '../types/api-response.type';
 import { CUSTOM_MESSAGE_KEY } from '../decorators/custom-message.decorator';
+import { CUSTOM_STATUS_KEY } from '../decorators/custom-status.decorator';
 
 @Injectable()
 export class ResponseInterceptor<T>
@@ -21,22 +22,57 @@ export class ResponseInterceptor<T>
     next: CallHandler,
   ): Observable<ApiResponse<T>> {
     const request = context.switchToHttp().getRequest();
-    const statusCode = context.switchToHttp().getResponse().statusCode;
+    const defaultStatus = context.switchToHttp().getResponse().statusCode;
 
     const customMessage = this.reflector.getAllAndOverride<string>(
       CUSTOM_MESSAGE_KEY,
       [context.getHandler(), context.getClass()],
     );
 
+    const customStatus = this.reflector.getAllAndOverride<number>(
+      CUSTOM_STATUS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        statusCode,
-        message: customMessage || this.getMessage(statusCode, request.method),
-        data,
-        timestamp: new Date().toISOString(),
-        path: request.path,
-      })),
+      map((data: any) => {
+        // priority: service > @CustomStatus > controller default
+        const effectiveStatus =
+          data?.statusCode || customStatus || defaultStatus;
+
+        // priority: service > @CustomMessage > fallback
+        const message =
+          data?.message ||
+          customMessage ||
+          this.getMessage(effectiveStatus, request.method);
+
+        let responseData: any = null;
+
+        if (data && typeof data === 'object') {
+          if ('data' in data) {
+            // If the service explicitly returned { message, data }
+            responseData = data.data;
+          } else if (!('data' in data) && !('message' in data)) {
+            // If it's just a plain object (e.g. entity, DTO, etc.)
+            responseData = data;
+          } else {
+            // If only message was returned, keep data null
+            responseData = null;
+          }
+        } else {
+          // primitive (string, number, boolean)
+          responseData = data;
+        }
+
+        return {
+          success: effectiveStatus >= 200 && effectiveStatus < 300,
+          statusCode: effectiveStatus,
+          message,
+          data: responseData,
+          timestamp: new Date().toISOString(),
+          path: request.path,
+        };
+      }),
     );
   }
 

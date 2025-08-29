@@ -10,10 +10,10 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Token } from '../enums/token.enum';
-import { JwtService } from '../services/jwt.service';
-import { UsersService } from '../../modules/users/users.service';
-import { UserResponseDto } from '../../modules/users/dto/user-response.dto';
+import { UserService } from '../../modules/user/user.service';
+import { UserResponseDto } from '../../modules/user/dto/user-response.dto';
 import { UserRole } from '../enums/user-role.enum';
+import { JwtService } from '@nestjs/jwt';
 
 interface JwtPayload {
   sub: string;
@@ -28,7 +28,7 @@ export class RolesGuard implements CanActivate {
 
   constructor(
     private readonly reflector: Reflector,
-    private readonly usersService: UsersService,
+    private readonly usersService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -44,7 +44,7 @@ export class RolesGuard implements CanActivate {
     const token = this.extractTokenFromHeader(req);
 
     try {
-      const payload = (await this.jwtService.verifyToken(token)) as JwtPayload;
+      const payload = (await this.jwtService.verifyAsync(token)) as JwtPayload;
 
       if (payload.purpose !== Token.AUTHORIZATION) {
         throw new UnauthorizedException('Invalid token purpose');

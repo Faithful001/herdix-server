@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsString, Matches } from 'class-validator';
-import { UserRole } from 'src/modules/users/enums/user-role.enum';
+import { UserRole } from 'src/modules/user/enums/user-role.enum';
 
 export class LoginDto {
   @ApiProperty({
@@ -13,10 +13,10 @@ export class LoginDto {
 
   @ApiProperty({ description: "The user's password", example: 'password123' })
   @IsString()
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-    { message: 'Invalid password provided' },
-  )
+  // @Matches(
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+  //   { message: 'Invalid password provided' },
+  // )
   password: string;
 
   @ApiProperty({

@@ -1,17 +1,28 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { UserResponseDto } from 'src/modules/users/dto/user-response.dto';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Request } from 'express';
 
 @Injectable()
 export class PasswordChangedGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
-    const req = context
-      .switchToHttp()
-      .getRequest<Request & { user?: UserResponseDto }>();
+  private excludedPaths = ['/health', '/auth'];
 
-    if (req.path.startsWith('/auth/')) {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest<Request>();
+
+    // Skip guard for excluded paths
+    if (this.excludedPaths.some((path) => request.path.startsWith(path))) {
       return true;
     }
-    return req.user?.isPasswordChanged;
+
+    const user = request.user;
+    if (user && !user.isPasswordChanged) {
+      throw new ForbiddenException('Password must be changed');
+    }
+
+    return true;
   }
 }

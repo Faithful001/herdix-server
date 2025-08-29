@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsString, Matches } from 'class-validator';
-import { UserRole } from 'src/modules/users/enums/user-role.enum';
+import { UserRole } from 'src/modules/user/enums/user-role.enum';
 
 export class RegisterDto {
   @ApiProperty({ description: "The user's first name", example: 'John' })
@@ -19,6 +19,20 @@ export class RegisterDto {
   @IsEmail()
   email: string;
 
+  @ApiProperty({
+    description: "The user's phoneNumber",
+    example: '08012345678',
+  })
+  @IsString()
+  phoneNumber: string;
+
+  @ApiProperty({
+    description: "The user's address",
+    example: '123 Main St',
+  })
+  @IsString()
+  address: string;
+
   @ApiProperty({ description: "The user's password", example: 'password123' })
   @IsString()
   @Matches(
@@ -27,12 +41,7 @@ export class RegisterDto {
   )
   password: string;
 
-  @ApiProperty({
-    description: "The user's role",
-    example: UserRole.FARMER,
-    enum: UserRole,
-    enumName: 'UserRole',
-  })
+  @ApiProperty({ description: "The user's role", example: 'farmer' })
   @IsEnum(UserRole, { message: 'Invalid role provided' })
   role: UserRole;
 }

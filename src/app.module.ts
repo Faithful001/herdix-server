@@ -1,14 +1,25 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './modules/users/users.module';
+import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { PasswordChangedGuard } from './common/guards/password-changed.guard';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { FarmerModule } from './modules/farmer/farmer.module';
+import { EmailModule } from './modules/email/email.module';
+import { QueueModule } from './modules/queue/queue.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-ioredis';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { OtpModule } from './modules/otp/otp.module';
+import { SharedModule } from './common/modules/SharedModule';
+import { ManagerModule } from './modules/manager/manager.module';
+import { LivestockModule } from './modules/livestock/livestock.module';
 
 @Module({
   imports: [
@@ -19,8 +30,8 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
         if (!config.MONGODB_URI) {
           throw new Error('MONGODB_URI is not defined in .env file');
         }
-        if (!config.JWT_SEC) {
-          throw new Error('JWT_SEC is not defined in .env file');
+        if (!config.JWT_SECRET) {
+          throw new Error('JWT_SECRET is not defined in .env file');
         }
         return config;
       },
@@ -32,8 +43,36 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        url: configService.get<string>('REDIS_URL'),
+        ttl: 30 * 60, // 30 minutes (seconds)
+      }),
+      inject: [ConfigService],
+    }),
+    PassportModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRATION', '1d'),
+        },
+      }),
+    }),
+    SharedModule,
+    UserModule,
     AuthModule,
+    FarmerModule,
+    EmailModule,
+    QueueModule,
+    OtpModule,
+    ManagerModule,
+    LivestockModule,
   ],
   controllers: [AppController],
   providers: [
@@ -46,13 +85,17 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
     },
+    {
+      provide: APP_GUARD,
+      useClass: PasswordChangedGuard,
+    },
   ],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(PasswordChangedGuard)
-      .exclude({ path: 'auth/(.*)', method: RequestMethod.ALL })
-      .forRoutes('*');
-  }
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(PasswordChangedGuard)
+  //     .exclude({ path: 'auth/(.*)', method: RequestMethod.ALL })
+  //     .forRoutes('*');
+  // }
 }
