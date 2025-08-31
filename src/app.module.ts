@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -17,9 +17,12 @@ import * as redisStore from 'cache-manager-ioredis';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { OtpModule } from './modules/otp/otp.module';
-import { SharedModule } from './common/modules/SharedModule';
 import { ManagerModule } from './modules/manager/manager.module';
 import { LivestockModule } from './modules/livestock/livestock.module';
+import { LivestockTypeModule } from './modules/livestock-type/livestock-type.module';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
+import { UploadModule } from './modules/upload/upload.module';
+import { CloudinaryService } from './modules/cloudinary/cloudinary.service';
 
 @Module({
   imports: [
@@ -64,7 +67,6 @@ import { LivestockModule } from './modules/livestock/livestock.module';
         },
       }),
     }),
-    SharedModule,
     UserModule,
     AuthModule,
     FarmerModule,
@@ -73,6 +75,9 @@ import { LivestockModule } from './modules/livestock/livestock.module';
     OtpModule,
     ManagerModule,
     LivestockModule,
+    LivestockTypeModule,
+    CloudinaryModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
@@ -88,6 +93,10 @@ import { LivestockModule } from './modules/livestock/livestock.module';
     {
       provide: APP_GUARD,
       useClass: PasswordChangedGuard,
+    },
+    {
+      provide: 'FileStorage', // token for DI
+      useClass: CloudinaryService,
     },
   ],
 })

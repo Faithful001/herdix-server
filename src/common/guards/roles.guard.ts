@@ -57,6 +57,10 @@ export class RolesGuard implements CanActivate {
 
       req.user = user;
 
+      if (requiredRoles && requiredRoles.includes(UserRole.ALL)) {
+        return true;
+      }
+
       if (requiredRoles && !requiredRoles.includes(user.role as UserRole)) {
         throw new ForbiddenException('Insufficient role permissions');
       }

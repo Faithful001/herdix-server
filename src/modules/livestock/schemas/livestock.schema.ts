@@ -1,15 +1,26 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Document, HydratedDocument, Types } from 'mongoose';
+import { HealthStatus } from '../enums/health-status.enum';
+import { LivestockType } from 'src/modules/livestock-type/schemas/livestock-type.schema';
 
-export type LivestockTypeDocument = HydratedDocument<LivestockType>;
+export type LivestockDocument = HydratedDocument<Livestock>;
 
 @Schema({ timestamps: true })
-export class LivestockType {
-  @Prop({ required: true, unique: true })
-  name: string;
+export class Livestock {
+  @Prop({ type: Types.ObjectId, ref: LivestockType.name, required: true })
+  type: Types.ObjectId;
 
-  @Prop({ required: false })
-  description?: string;
+  @Prop({ required: true })
+  age: number;
+
+  @Prop({ enum: HealthStatus, required: true })
+  healthStatus: HealthStatus;
+
+  @Prop({
+    type: String,
+    required: false,
+  })
+  imageUrl?: string;
 }
 
-export const LivestockTypeSchema = SchemaFactory.createForClass(LivestockType);
+export const LivestockSchema = SchemaFactory.createForClass(Livestock);
