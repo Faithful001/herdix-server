@@ -23,6 +23,8 @@ import { LivestockTypeModule } from './modules/livestock-type/livestock-type.mod
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { CloudinaryService } from './modules/cloudinary/cloudinary.service';
+import { CropModule } from './modules/crop/crop.module';
+import { CropTypeModule } from './modules/crop-type/crop-type.module';
 
 @Module({
   imports: [
@@ -78,6 +80,8 @@ import { CloudinaryService } from './modules/cloudinary/cloudinary.service';
     LivestockTypeModule,
     CloudinaryModule,
     UploadModule,
+    CropModule,
+    CropTypeModule,
   ],
   controllers: [AppController],
   providers: [

@@ -43,9 +43,9 @@ export class LivestockController {
   }
 
   @Post('create-bulk')
-  @ApiResponse({ status: 201, description: 'Livestock created successfully' })
+  @ApiResponse({ status: 201, description: 'Livestocks created successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
-  @ApiOperation({ summary: 'Create a livestock' })
+  @ApiOperation({ summary: 'Create livestock' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   @HttpCode(201)
@@ -54,9 +54,9 @@ export class LivestockController {
   }
 
   @Post('create-many')
-  @ApiResponse({ status: 201, description: 'Livestock created successfully' })
+  @ApiResponse({ status: 201, description: 'Livestocks created successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
-  @ApiOperation({ summary: 'Create a livestock' })
+  @ApiOperation({ summary: 'Create livestock' })
   @HttpCode(201)
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
@@ -65,7 +65,7 @@ export class LivestockController {
   }
 
   @Get()
-  @ApiResponse({ status: 200, description: 'Livestock found successfully' })
+  @ApiResponse({ status: 200, description: 'Livestocks found successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiOperation({ summary: 'Find all livestock' })
   @UseGuards(RolesGuard)
@@ -76,7 +76,7 @@ export class LivestockController {
   }
 
   @Get('type/:type')
-  @ApiResponse({ status: 200, description: 'Livestock found successfully' })
+  @ApiResponse({ status: 200, description: 'Livestocks found successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiOperation({ summary: 'Find all livestock of a type' })
   @UseGuards(RolesGuard)

@@ -8,7 +8,7 @@ export class CreateLivestockTypeDto {
   name: string;
 
   @ApiProperty({
-    example: 'This is the cattle',
+    example: 'This is a cattle',
     description: 'Description of the livestock type',
   })
   @IsString()
