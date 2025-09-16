@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CropService } from './crop.service';
 import { BulkCreateCropDto, CreateCropDto } from './dto/create-crop.dto';
@@ -21,6 +22,7 @@ import {
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-role.enum';
+import { Request } from 'express';
 
 @ApiTags('Crop')
 @ApiBearerAuth('JWT')
@@ -35,8 +37,8 @@ export class CropController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   @HttpCode(201)
-  create(@Body() createCropDto: CreateCropDto) {
-    return this.cropService.create(createCropDto);
+  create(@Req() request: Request, @Body() createCropDto: CreateCropDto) {
+    return this.cropService.create(request, createCropDto);
   }
 
   @Post('create-bulk')
@@ -46,8 +48,11 @@ export class CropController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   @HttpCode(201)
-  createBulk(@Body() bulkCreateCropDto: BulkCreateCropDto) {
-    return this.cropService.createBulk(bulkCreateCropDto);
+  createBulk(
+    @Req() request: Request,
+    @Body() bulkCreateCropDto: BulkCreateCropDto,
+  ) {
+    return this.cropService.createBulk(request, bulkCreateCropDto);
   }
 
   @Post('create-many')
@@ -57,8 +62,8 @@ export class CropController {
   @HttpCode(201)
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
-  createMany(@Body() createCropDto: CreateCropDto[]) {
-    return this.cropService.createMany(createCropDto);
+  createMany(@Req() request: Request, @Body() createCropDto: CreateCropDto[]) {
+    return this.cropService.createMany(request, createCropDto);
   }
 
   @Get()
@@ -68,8 +73,8 @@ export class CropController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   @HttpCode(200)
-  findAll() {
-    return this.cropService.findAll();
+  findAll(@Req() request: Request) {
+    return this.cropService.findAll(request);
   }
 
   @Get('type/:type')
@@ -79,8 +84,8 @@ export class CropController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   @HttpCode(200)
-  findManyByType(@Param('type') type: string) {
-    return this.cropService.findManyByType(type);
+  findManyByType(@Req() request: Request, @Param('type') type: string) {
+    return this.cropService.findManyByType(request, type);
   }
 
   @ApiResponse({ status: 200, description: 'Crop found successfully' })
@@ -90,8 +95,8 @@ export class CropController {
   @Roles(UserRole.ALL)
   @HttpCode(200)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cropService.findOne(id);
+  findOne(@Req() request: Request, @Param('id') id: string) {
+    return this.cropService.findOne(request, id);
   }
 
   @ApiResponse({ status: 200, description: 'Crop updated successfully' })
@@ -101,8 +106,12 @@ export class CropController {
   @Roles(UserRole.ALL)
   @HttpCode(200)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCropDto: UpdateCropDto) {
-    return this.cropService.update(id, updateCropDto);
+  update(
+    @Req() request: Request,
+    @Param('id') id: string,
+    @Body() updateCropDto: UpdateCropDto,
+  ) {
+    return this.cropService.update(request, id, updateCropDto);
   }
 
   @ApiResponse({ status: 200, description: 'Crop deleted successfully' })
@@ -112,7 +121,7 @@ export class CropController {
   @Roles(UserRole.ALL)
   @HttpCode(200)
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.cropService.delete(id);
+  delete(@Req() request: Request, @Param('id') id: string) {
+    return this.cropService.delete(request, id);
   }
 }

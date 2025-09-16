@@ -12,26 +12,26 @@ export class FarmerRepository {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async create(createFarmerDto: CreateFarmerDto) {
-    return this.userModel.create(createFarmerDto);
+  async create(farmId: string, createFarmerDto: CreateFarmerDto) {
+    return this.userModel.create({ ...createFarmerDto, farmId });
   }
 
-  async findAll() {
-    return this.userModel.find({ role: UserRole.FARMER }).lean().exec();
+  async findAll(farmId: string) {
+    return this.userModel.find({ role: UserRole.FARMER, farmId }).lean().exec();
   }
 
-  async findById(id: string) {
-    return this.userModel.findById(id).lean().exec();
+  async findById(farmId: string, id: string) {
+    return this.userModel.findOne({ _id: id, farmId }).lean().exec();
   }
 
-  async update(id: string, updateFarmerDto: UpdateFarmerDto) {
+  async update(farmId: string, id: string, updateFarmerDto: UpdateFarmerDto) {
     return this.userModel
-      .findByIdAndUpdate(id, updateFarmerDto, { new: true })
+      .findOneAndUpdate({ _id: id, farmId }, updateFarmerDto, { new: true })
       .lean()
       .exec();
   }
 
-  async delete(id: string) {
-    return this.userModel.findByIdAndDelete(id).lean().exec();
+  async delete(farmId: string, id: string) {
+    return this.userModel.findOneAndDelete({ _id: id, farmId }).lean().exec();
   }
 }

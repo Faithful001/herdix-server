@@ -5,7 +5,7 @@ import { FarmerRepository } from './farmer.repository';
 import Password from 'src/common/utils/password.util';
 import { UserRole } from '../user/enums/user-role.enum';
 import { EmailService } from 'src/modules/email/email.service';
-import passwordUtil from 'src/common/utils/password.util';
+import { Request } from 'express';
 
 @Injectable()
 export class FarmerService {
@@ -13,9 +13,10 @@ export class FarmerService {
     private readonly farmerRepository: FarmerRepository,
     private readonly emailService: EmailService,
   ) {}
-  async create(createFarmerDto: CreateFarmerDto) {
+  async create(request: Request, createFarmerDto: CreateFarmerDto) {
+    const farmId = request.user.farmId;
     const password = Password.generate();
-    createFarmerDto['password'] = await passwordUtil.hashPassword(password);
+    createFarmerDto['password'] = await Password.hashPassword(password);
     createFarmerDto['role'] = UserRole.FARMER;
     createFarmerDto['isPasswordChanged'] = false;
 
@@ -26,22 +27,50 @@ export class FarmerService {
       message: `Hello ${createFarmerDto.firstName}, you have successfully created an account on Herdix. Your temporary password is ${password}`,
     });
 
-    return this.farmerRepository.create(createFarmerDto);
+    await this.farmerRepository.create(farmId, createFarmerDto);
+    return {
+      message: 'Farmer created successfully',
+      data: createFarmerDto,
+    };
   }
 
-  findAll() {
-    return this.farmerRepository.findAll();
+  async findAll(request: Request) {
+    const farmId = request.user.farmId;
+    const farmers = await this.farmerRepository.findAll(farmId);
+    return {
+      message: 'Farmers fetched successfully',
+      data: farmers,
+    };
   }
 
-  findOne(id: string) {
-    return this.farmerRepository.findById(id);
+  async findOne(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const farmer = await this.farmerRepository.findById(farmId, id);
+    return {
+      message: 'Farmer fetched successfully',
+      data: farmer,
+    };
   }
 
-  update(id: string, updateFarmerDto: UpdateFarmerDto) {
-    return this.farmerRepository.update(id, updateFarmerDto);
+  async update(request: Request, id: string, updateFarmerDto: UpdateFarmerDto) {
+    const farmId = request.user.farmId;
+    const updatedFarmer = await this.farmerRepository.update(
+      farmId,
+      id,
+      updateFarmerDto,
+    );
+    return {
+      message: 'Farmer updated successfully',
+      data: updatedFarmer,
+    };
   }
 
-  delete(id: string) {
-    return this.farmerRepository.delete(id);
+  async delete(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const deletedFarmer = await this.farmerRepository.delete(farmId, id);
+    return {
+      message: 'Farmer deleted successfully',
+      data: deletedFarmer,
+    };
   }
 }

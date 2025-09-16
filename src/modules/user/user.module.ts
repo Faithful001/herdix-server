@@ -2,9 +2,8 @@ import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { UserSchema } from './schemas/user.schema';
+import { User, UserSchema } from './schemas/user.schema';
 import { UserRepository } from './user.repository';
-import { User } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { OtpModule } from '../otp/otp.module';
 

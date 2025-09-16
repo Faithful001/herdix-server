@@ -1,8 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsString, Matches } from 'class-validator';
+import { IsEmail, IsEnum, IsMongoId, IsString, Matches } from 'class-validator';
 import { UserRole } from 'src/modules/user/enums/user-role.enum';
 
 export class RegisterDto {
+  @ApiProperty({ description: 'Farm id', example: '123445678ab' })
+  @IsMongoId()
+  farmId: string;
+
   @ApiProperty({ description: "The user's first name", example: 'John' })
   @IsString()
   firstName: string;

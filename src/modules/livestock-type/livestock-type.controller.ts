@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { LivestockTypeService } from './livestock-type.service';
 import { CreateLivestockTypeDto } from './dto/create-livestock-type.dto';
@@ -21,6 +22,7 @@ import {
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { UserRole } from '../user/enums/user-role.enum';
+import { Request } from 'express';
 
 @ApiTags('Livestock Type')
 @ApiBearerAuth('JWT')
@@ -35,8 +37,11 @@ export class LivestockTypeController {
   @ApiOperation({ summary: 'Create a livestock type' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  create(@Body() createLivestockTypeDto: CreateLivestockTypeDto) {
-    return this.livestockTypeService.create(createLivestockTypeDto);
+  create(
+    @Req() request: Request,
+    @Body() createLivestockTypeDto: CreateLivestockTypeDto,
+  ) {
+    return this.livestockTypeService.create(request, createLivestockTypeDto);
   }
 
   @Get()
@@ -46,8 +51,8 @@ export class LivestockTypeController {
   @ApiOperation({ summary: 'Find all livestock types' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  findAll() {
-    return this.livestockTypeService.findAll();
+  findAll(@Req() request: Request) {
+    return this.livestockTypeService.findAll(request);
   }
 
   @Get(':id')
@@ -57,8 +62,8 @@ export class LivestockTypeController {
   @ApiOperation({ summary: 'Find a livestock type by ID' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  findOne(@Param('id') id: string) {
-    return this.livestockTypeService.findOne(id);
+  findOne(@Req() request: Request, @Param('id') id: string) {
+    return this.livestockTypeService.findOne(request, id);
   }
 
   @Get('name/:name')
@@ -68,8 +73,8 @@ export class LivestockTypeController {
   @ApiOperation({ summary: 'Find a livestock type by name' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  findOneByName(@Param('name') name: string) {
-    return this.livestockTypeService.findOneByName(name);
+  findOneByName(@Req() request: Request, @Param('name') name: string) {
+    return this.livestockTypeService.findOneByName(request, name);
   }
 
   @Patch('update/:id')
@@ -80,10 +85,15 @@ export class LivestockTypeController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   update(
+    @Req() request: Request,
     @Param('id') id: string,
     @Body() updateLivestockTypeDto: UpdateLivestockTypeDto,
   ) {
-    return this.livestockTypeService.update(id, updateLivestockTypeDto);
+    return this.livestockTypeService.update(
+      request,
+      id,
+      updateLivestockTypeDto,
+    );
   }
 
   @Delete('delete/:id')
@@ -93,7 +103,7 @@ export class LivestockTypeController {
   @ApiOperation({ summary: 'Delete a livestock type by ID' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  delete(@Param('id') id: string) {
-    return this.livestockTypeService.delete(id);
+  delete(@Req() request: Request, @Param('id') id: string) {
+    return this.livestockTypeService.delete(request, id);
   }
 }

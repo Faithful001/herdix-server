@@ -6,6 +6,7 @@ import {
 import { UpdateLivestockDto } from './dto/update-livestock.dto';
 import { LivestockRepository } from './livestock.repository';
 import { LivestockTypeRepository } from '../livestock-type/livestock-type.repository';
+import { Request } from 'express';
 
 @Injectable()
 export class LivestockService {
@@ -18,12 +19,17 @@ export class LivestockService {
   ) {}
 
   /** Utility: resolve livestock type with caching */
-  private async resolveLivestockType(typeName: string): Promise<string> {
+  private async resolveLivestockType(
+    farmId: string,
+    typeName: string,
+  ): Promise<string> {
     if (this.typeCache.has(typeName)) {
       return this.typeCache.get(typeName);
     }
-    const livestockType =
-      await this.livestockTypeRepository.findByName(typeName);
+    const livestockType = await this.livestockTypeRepository.findByName(
+      farmId,
+      typeName,
+    );
     if (!livestockType) throw new Error('Invalid livestock type');
 
     const typeId = livestockType._id.toString();
@@ -31,9 +37,13 @@ export class LivestockService {
     return typeId;
   }
 
-  async create(createLivestockDto: CreateLivestockDto) {
-    const typeId = await this.resolveLivestockType(createLivestockDto.type);
-    const createdLivestock = await this.livestockRepository.create({
+  async create(request: Request, createLivestockDto: CreateLivestockDto) {
+    const farmId = request.user.farmId;
+    const typeId = await this.resolveLivestockType(
+      farmId,
+      createLivestockDto.type,
+    );
+    const createdLivestock = await this.livestockRepository.create(farmId, {
       ...createLivestockDto,
       type: typeId,
     });
@@ -44,7 +54,11 @@ export class LivestockService {
     };
   }
 
-  async createMany(createLivestockDtos: CreateLivestockDto[]) {
+  async createMany(
+    request: Request,
+    createLivestockDtos: CreateLivestockDto[],
+  ) {
+    const farmId = request.user.farmId;
     if (!createLivestockDtos || createLivestockDtos.length === 0) {
       return {
         message: 'No livestock provided',
@@ -53,15 +67,20 @@ export class LivestockService {
     }
 
     // assume all livestock share the same type
-    const typeId = await this.resolveLivestockType(createLivestockDtos[0].type);
+    const typeId = await this.resolveLivestockType(
+      farmId,
+      createLivestockDtos[0].type,
+    );
 
     const mappedDtos = createLivestockDtos.map((dto) => ({
       ...dto,
       type: typeId,
     }));
 
-    const createdLivestock =
-      await this.livestockRepository.createMany(mappedDtos);
+    const createdLivestock = await this.livestockRepository.createMany(
+      farmId,
+      mappedDtos,
+    );
 
     return {
       message: 'Many livestock created successfully',
@@ -69,8 +88,15 @@ export class LivestockService {
     };
   }
 
-  async createBulk(createLivestockDto: BulkCreateLivestockDto) {
-    const typeId = await this.resolveLivestockType(createLivestockDto.type);
+  async createBulk(
+    request: Request,
+    createLivestockDto: BulkCreateLivestockDto,
+  ) {
+    const farmId = request.user.farmId;
+    const typeId = await this.resolveLivestockType(
+      farmId,
+      createLivestockDto.type,
+    );
 
     const bulkDtos = Array.from(
       { length: createLivestockDto.quantity },
@@ -80,8 +106,10 @@ export class LivestockService {
       }),
     );
 
-    const createdLivestock =
-      await this.livestockRepository.createMany(bulkDtos);
+    const createdLivestock = await this.livestockRepository.createMany(
+      farmId,
+      bulkDtos,
+    );
 
     return {
       message: 'Bulk livestock created successfully',
@@ -92,8 +120,9 @@ export class LivestockService {
     };
   }
 
-  async findAll() {
-    const livestock = await this.livestockRepository.findAll();
+  async findAll(request: Request) {
+    const farmId = request.user.farmId;
+    const livestock = await this.livestockRepository.findAll(farmId);
 
     return {
       message: 'Livestock fetched successfully',
@@ -101,8 +130,9 @@ export class LivestockService {
     };
   }
 
-  async findOne(id: string) {
-    const livestock = await this.livestockRepository.findById(id);
+  async findOne(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const livestock = await this.livestockRepository.findById(farmId, id);
     if (!livestock) {
       throw new NotFoundException(`Livestock with id ${id} not found`);
     }
@@ -112,9 +142,12 @@ export class LivestockService {
     };
   }
 
-  async findManyByType(type: string) {
-    const livestock =
-      await this.livestockRepository.findManyByLivestockType(type);
+  async findManyByType(request: Request, type: string) {
+    const farmId = request.user.farmId;
+    const livestock = await this.livestockRepository.findManyByLivestockType(
+      farmId,
+      type,
+    );
 
     if (!livestock || livestock.length === 0) {
       throw new NotFoundException(`No livestock found for the type ${type}`);
@@ -126,15 +159,22 @@ export class LivestockService {
     };
   }
 
-  async update(id: string, updateLivestockDto: UpdateLivestockDto) {
+  async update(
+    request: Request,
+    id: string,
+    updateLivestockDto: UpdateLivestockDto,
+  ) {
+    const farmId = request.user.farmId;
     // resolve type if being updated
     if (updateLivestockDto.type) {
       updateLivestockDto.type = await this.resolveLivestockType(
+        farmId,
         updateLivestockDto.type,
       );
     }
 
     const updatedLivestock = await this.livestockRepository.update(
+      farmId,
       id,
       updateLivestockDto,
     );
@@ -148,8 +188,9 @@ export class LivestockService {
     };
   }
 
-  async delete(id: string) {
-    const removedLivestock = await this.livestockRepository.delete(id);
+  async delete(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const removedLivestock = await this.livestockRepository.delete(farmId, id);
 
     if (!removedLivestock) {
       throw new NotFoundException(`Livestock with id ${id} not found`);

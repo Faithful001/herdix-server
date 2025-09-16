@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CropTypeService } from './crop-type.service';
 import { CreateCropTypeDto } from './dto/create-crop-type.dto';
@@ -21,6 +22,7 @@ import {
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { UserRole } from '../user/enums/user-role.enum';
+import { Request } from 'express';
 
 @ApiTags('Crop Type')
 @ApiBearerAuth('JWT')
@@ -35,8 +37,11 @@ export class CropTypeController {
   @ApiOperation({ summary: 'Create a crop type' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  create(@Body() createCropTypeDto: CreateCropTypeDto) {
-    return this.cropTypeService.create(createCropTypeDto);
+  create(
+    @Req() request: Request,
+    @Body() createCropTypeDto: CreateCropTypeDto,
+  ) {
+    return this.cropTypeService.create(request, createCropTypeDto);
   }
 
   @Get()
@@ -46,8 +51,8 @@ export class CropTypeController {
   @ApiOperation({ summary: 'Find all crop types' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  findAll() {
-    return this.cropTypeService.findAll();
+  findAll(@Req() request: Request) {
+    return this.cropTypeService.findAll(request);
   }
 
   @Get(':id')
@@ -57,8 +62,8 @@ export class CropTypeController {
   @ApiOperation({ summary: 'Find a crop type by ID' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  findOne(@Param('id') id: string) {
-    return this.cropTypeService.findOne(id);
+  findOne(@Req() request: Request, @Param('id') id: string) {
+    return this.cropTypeService.findOne(request, id);
   }
 
   @Get('name/:name')
@@ -68,8 +73,8 @@ export class CropTypeController {
   @ApiOperation({ summary: 'Find a crop type by name' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  findOneByName(@Param('name') name: string) {
-    return this.cropTypeService.findOneByName(name);
+  findOneByName(@Req() request: Request, @Param('name') name: string) {
+    return this.cropTypeService.findOneByName(request, name);
   }
 
   @Patch('update/:id')
@@ -80,10 +85,11 @@ export class CropTypeController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
   update(
+    @Req() request: Request,
     @Param('id') id: string,
     @Body() updateCropTypeDto: UpdateCropTypeDto,
   ) {
-    return this.cropTypeService.update(id, updateCropTypeDto);
+    return this.cropTypeService.update(request, id, updateCropTypeDto);
   }
 
   @Delete('delete/:id')
@@ -93,7 +99,7 @@ export class CropTypeController {
   @ApiOperation({ summary: 'Delete a crop type by ID' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  delete(@Param('id') id: string) {
-    return this.cropTypeService.delete(id);
+  delete(@Req() request: Request, @Param('id') id: string) {
+    return this.cropTypeService.delete(request, id);
   }
 }

@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateCropTypeDto } from './dto/create-crop-type.dto';
 import { UpdateCropTypeDto } from './dto/update-crop-type.dto';
-import { CropTypeDocument, CropType } from './schema/crop-type.schema';
+import { CropTypeDocument, CropType } from './schemas/crop-type.schema';
 
 @Injectable()
 export class CropTypeRepository {
@@ -12,29 +12,29 @@ export class CropTypeRepository {
     private readonly cropTypeModel: Model<CropTypeDocument>,
   ) {}
 
-  create(createCropTypeDto: CreateCropTypeDto) {
-    return this.cropTypeModel.create(createCropTypeDto);
+  create(farmId: string, createCropTypeDto: CreateCropTypeDto) {
+    return this.cropTypeModel.create({ ...createCropTypeDto, farmId });
   }
 
-  findAll() {
-    return this.cropTypeModel.find().exec();
+  findAll(farmId: string) {
+    return this.cropTypeModel.find({ farmId }).exec();
   }
 
-  findOne(id: string) {
-    return this.cropTypeModel.findById(id).exec();
+  findOne(farmId: string, id: string) {
+    return this.cropTypeModel.findOne({ farmId, _id: id }).exec();
   }
 
-  findByName(name: string) {
-    return this.cropTypeModel.findOne({ name }).exec();
+  findByName(farmId: string, name: string) {
+    return this.cropTypeModel.findOne({ farmId, name }).exec();
   }
 
-  update(id: string, updateCropTypeDto: UpdateCropTypeDto) {
+  update(farmId: string, id: string, updateCropTypeDto: UpdateCropTypeDto) {
     return this.cropTypeModel
-      .findByIdAndUpdate(id, updateCropTypeDto, { new: true })
+      .findOneAndUpdate({ farmId, _id: id }, updateCropTypeDto, { new: true })
       .exec();
   }
 
-  delete(id: string) {
-    return this.cropTypeModel.findByIdAndDelete(id).exec();
+  delete(farmId: string, id: string) {
+    return this.cropTypeModel.findOneAndDelete({ farmId, _id: id }).exec();
   }
 }

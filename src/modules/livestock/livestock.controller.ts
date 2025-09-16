@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { LivestockService } from './livestock.service';
 import {
@@ -24,6 +25,7 @@ import {
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/user-role.enum';
+import { Request } from 'express';
 
 @ApiTags('Livestock')
 @ApiBearerAuth('JWT')
@@ -38,8 +40,11 @@ export class LivestockController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   @HttpCode(201)
-  create(@Body() createLivestockDto: CreateLivestockDto) {
-    return this.livestockService.create(createLivestockDto);
+  create(
+    @Req() request: Request,
+    @Body() createLivestockDto: CreateLivestockDto,
+  ) {
+    return this.livestockService.create(request, createLivestockDto);
   }
 
   @Post('create-bulk')
@@ -49,8 +54,11 @@ export class LivestockController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   @HttpCode(201)
-  createBulk(@Body() bulkCreateLivestockDto: BulkCreateLivestockDto) {
-    return this.livestockService.createBulk(bulkCreateLivestockDto);
+  createBulk(
+    @Req() request: Request,
+    @Body() bulkCreateLivestockDto: BulkCreateLivestockDto,
+  ) {
+    return this.livestockService.createBulk(request, bulkCreateLivestockDto);
   }
 
   @Post('create-many')
@@ -60,8 +68,11 @@ export class LivestockController {
   @HttpCode(201)
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
-  createMany(@Body() createLivestockDto: CreateLivestockDto[]) {
-    return this.livestockService.createMany(createLivestockDto);
+  createMany(
+    @Req() request: Request,
+    @Body() createLivestockDto: CreateLivestockDto[],
+  ) {
+    return this.livestockService.createMany(request, createLivestockDto);
   }
 
   @Get()
@@ -71,8 +82,8 @@ export class LivestockController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   @HttpCode(200)
-  findAll() {
-    return this.livestockService.findAll();
+  findAll(@Req() request: Request) {
+    return this.livestockService.findAll(request);
   }
 
   @Get('type/:type')
@@ -82,8 +93,8 @@ export class LivestockController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   @HttpCode(200)
-  findManyByType(@Param('type') type: string) {
-    return this.livestockService.findManyByType(type);
+  findManyByType(@Req() request: Request, @Param('type') type: string) {
+    return this.livestockService.findManyByType(request, type);
   }
 
   @ApiResponse({ status: 200, description: 'Livestock found successfully' })
@@ -93,8 +104,8 @@ export class LivestockController {
   @Roles(UserRole.ALL)
   @HttpCode(200)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.livestockService.findOne(id);
+  findOne(@Req() request: Request, @Param('id') id: string) {
+    return this.livestockService.findOne(request, id);
   }
 
   @ApiResponse({ status: 200, description: 'Livestock updated successfully' })
@@ -105,10 +116,11 @@ export class LivestockController {
   @HttpCode(200)
   @Patch(':id')
   update(
+    @Req() request: Request,
     @Param('id') id: string,
     @Body() updateLivestockDto: UpdateLivestockDto,
   ) {
-    return this.livestockService.update(id, updateLivestockDto);
+    return this.livestockService.update(request, id, updateLivestockDto);
   }
 
   @ApiResponse({ status: 200, description: 'Livestock deleted successfully' })
@@ -118,7 +130,7 @@ export class LivestockController {
   @Roles(UserRole.ALL)
   @HttpCode(200)
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.livestockService.delete(id);
+  delete(@Req() request: Request, @Param('id') id: string) {
+    return this.livestockService.delete(request, id);
   }
 }

@@ -6,8 +6,8 @@ import { UpdateCropDto } from './dto/update-crop.dto';
 import {
   CropType,
   CropTypeDocument,
-} from '../crop-type/schema/crop-type.schema';
-import { Crop, CropDocument } from './schema/crop.schema';
+} from '../crop-type/schemas/crop-type.schema';
+import { Crop, CropDocument } from './schemas/crop.schema';
 
 @Injectable()
 export class CropRepository {
@@ -19,37 +19,46 @@ export class CropRepository {
   ) {}
 
   // Create
-  create(createCropDto: CreateCropDto) {
-    return this.cropModel.create(createCropDto);
+  create(farmId: string, createCropDto: CreateCropDto) {
+    return this.cropModel.create({ ...createCropDto, farmId });
   }
 
   // Create many
   async createMany(
+    farmId: string,
     createCropDtos: CreateCropDto[],
     options: { validate?: boolean } = { validate: true },
   ) {
     if (options.validate) {
       // Ensures validation + hooks (slower but safer)
-      return this.cropModel.create(createCropDtos);
+      return this.cropModel.create({ ...createCropDtos, farmId });
     } else {
       // Faster, skips middleware/validation unless explicitly enabled
-      return this.cropModel.insertMany(createCropDtos, {
-        ordered: false,
-      });
+      return this.cropModel.insertMany(
+        { ...createCropDtos, farmId },
+        {
+          ordered: false,
+        },
+      );
     }
   }
 
   //Create Bulk
-  async createBulk(bulkDto: BulkCreateCropDto) {
+  async createBulk(farmId: string, bulkDto: BulkCreateCropDto) {
     const { quantity, ...data } = bulkDto;
     const docs = Array.from({ length: quantity }, () => ({ ...data }));
-    return this.cropModel.insertMany(docs);
+    return this.cropModel.insertMany(
+      { ...docs, farmId },
+      {
+        ordered: false,
+      },
+    );
   }
 
   // Find all
-  findAll(order: 'asc' | 'desc' = 'desc') {
+  findAll(farmId: string, order: 'asc' | 'desc' = 'desc') {
     return this.cropModel
-      .find()
+      .find({ farmId })
       .sort({ createdAt: order === 'asc' ? 1 : -1 })
       .populate('type', 'name description')
       .lean()
@@ -57,43 +66,43 @@ export class CropRepository {
   }
 
   // Find by ID
-  findById(cropId: string) {
+  findById(farmId: string, cropId: string) {
     return this.cropModel
-      .findById(cropId)
+      .findOne({ _id: cropId, farmId })
       .populate('type', 'name description')
       .lean()
       .exec();
   }
 
   // Find by type (returns array)
-  async findManyByCropType(cropType: string) {
+  async findManyByCropType(farmId: string, cropType: string) {
     const cropTypeDoc = await this.cropTypeModel
-      .findOne({ name: cropType })
+      .findOne({ name: cropType, farmId })
       .lean()
       .exec();
 
     // Return empty array; service decides what to do if not found
     if (!cropTypeDoc) return [];
     return this.cropModel
-      .find({ type: cropTypeDoc._id.toString() })
+      .find({ type: cropTypeDoc._id.toString(), farmId })
       .populate('type', 'name description')
       .lean()
       .exec();
   }
 
   // Update
-  async update(cropId: string, updateData: UpdateCropDto) {
+  async update(farmId: string, cropId: string, updateData: UpdateCropDto) {
     return this.cropModel
-      .findByIdAndUpdate(cropId, updateData, { new: true })
+      .findOneAndUpdate({ _id: cropId, farmId }, updateData, { new: true })
       .populate('type', 'name description')
       .lean()
       .exec();
   }
 
   // Delete
-  async delete(cropId: string) {
+  async delete(farmId: string, cropId: string) {
     return this.cropModel
-      .findByIdAndDelete(cropId)
+      .findOneAndDelete({ _id: cropId, farmId })
       .populate('type', 'name description')
       .lean()
       .exec();

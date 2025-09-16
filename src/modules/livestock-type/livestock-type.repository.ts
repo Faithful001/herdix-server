@@ -15,29 +15,38 @@ export class LivestockTypeRepository {
     private readonly livestockTypeModel: Model<LivestockTypeDocument>,
   ) {}
 
-  create(createLivestockTypeDto: CreateLivestockTypeDto) {
-    return this.livestockTypeModel.create(createLivestockTypeDto);
+  create(farmId: string, createLivestockTypeDto: CreateLivestockTypeDto) {
+    return this.livestockTypeModel.create({
+      ...createLivestockTypeDto,
+      farmId,
+    });
   }
 
-  findAll() {
-    return this.livestockTypeModel.find().exec();
+  findAll(farmId: string) {
+    return this.livestockTypeModel.find({ farmId }).exec();
   }
 
-  findOne(id: string) {
-    return this.livestockTypeModel.findById(id).exec();
+  findOne(farmId: string, id: string) {
+    return this.livestockTypeModel.findOne({ _id: id, farmId }).exec();
   }
 
-  findByName(name: string) {
-    return this.livestockTypeModel.findOne({ name }).exec();
+  findByName(farmId: string, name: string) {
+    return this.livestockTypeModel.findOne({ name, farmId }).exec();
   }
 
-  update(id: string, updateLivestockTypeDto: UpdateLivestockTypeDto) {
+  update(
+    farmId: string,
+    id: string,
+    updateLivestockTypeDto: UpdateLivestockTypeDto,
+  ) {
     return this.livestockTypeModel
-      .findByIdAndUpdate(id, updateLivestockTypeDto, { new: true })
+      .findOneAndUpdate({ _id: id, farmId }, updateLivestockTypeDto, {
+        new: true,
+      })
       .exec();
   }
 
-  delete(id: string) {
-    return this.livestockTypeModel.findByIdAndDelete(id).exec();
+  delete(farmId: string, id: string) {
+    return this.livestockTypeModel.findOneAndDelete({ _id: id, farmId }).exec();
   }
 }

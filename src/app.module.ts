@@ -25,6 +25,7 @@ import { UploadModule } from './modules/upload/upload.module';
 import { CloudinaryService } from './modules/cloudinary/cloudinary.service';
 import { CropModule } from './modules/crop/crop.module';
 import { CropTypeModule } from './modules/crop-type/crop-type.module';
+import { FarmModule } from './modules/farm/farm.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { CropTypeModule } from './modules/crop-type/crop-type.module';
     UploadModule,
     CropModule,
     CropTypeModule,
+    FarmModule,
   ],
   controllers: [AppController],
   providers: [

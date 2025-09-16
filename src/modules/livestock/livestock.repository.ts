@@ -11,6 +11,7 @@ import {
   LivestockTypeDocument,
 } from '../livestock-type/schemas/livestock-type.schema';
 import { UpdateLivestockDto } from './dto/update-livestock.dto';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class LivestockRepository {
@@ -22,37 +23,53 @@ export class LivestockRepository {
   ) {}
 
   // Create
-  create(createLivestockDto: CreateLivestockDto) {
-    return this.livestockModel.create(createLivestockDto);
+  create(farmId: string, createLivestockDto: CreateLivestockDto) {
+    return this.livestockModel.create({
+      ...createLivestockDto,
+      farmId,
+    });
   }
 
   // Create many
   async createMany(
+    farmId: string,
     createLivestockDtos: CreateLivestockDto[],
     options: { validate?: boolean } = { validate: true },
   ) {
     if (options.validate) {
       // Ensures validation + hooks (slower but safer)
-      return this.livestockModel.create(createLivestockDtos);
+      return this.livestockModel.create({
+        ...createLivestockDtos,
+        farmId,
+      });
     } else {
       // Faster, skips middleware/validation unless explicitly enabled
-      return this.livestockModel.insertMany(createLivestockDtos, {
-        ordered: false,
-      });
+      return this.livestockModel.insertMany(
+        {
+          ...createLivestockDtos,
+          farmId,
+        },
+        {
+          ordered: false,
+        },
+      );
     }
   }
 
   //Create Bulk
-  async createBulk(bulkDto: BulkCreateLivestockDto) {
+  async createBulk(farmId: string, bulkDto: BulkCreateLivestockDto) {
     const { quantity, ...data } = bulkDto;
     const docs = Array.from({ length: quantity }, () => ({ ...data }));
-    return this.livestockModel.insertMany(docs);
+    return this.livestockModel.insertMany({
+      ...docs,
+      farmId,
+    });
   }
 
   // Find all
-  findAll(order: 'asc' | 'desc' = 'desc') {
+  findAll(farmId: string, order: 'asc' | 'desc' = 'desc') {
     return this.livestockModel
-      .find()
+      .find({ farmId })
       .sort({ createdAt: order === 'asc' ? 1 : -1 })
       .populate('type', 'name description')
       .lean()
@@ -60,18 +77,18 @@ export class LivestockRepository {
   }
 
   // Find by ID
-  findById(livestockId: string) {
+  findById(farmId: string, livestockId: string) {
     return this.livestockModel
-      .findById(livestockId)
+      .findOne({ _id: livestockId, farmId })
       .populate('type', 'name description')
       .lean()
       .exec();
   }
 
   // Find by type (returns array)
-  async findManyByLivestockType(livestockType: string) {
+  async findManyByLivestockType(farmId: string, livestockType: string) {
     const liveStockTypeDoc = await this.livestockTypeModel
-      .findOne({ name: livestockType })
+      .findOne({ name: livestockType, farmId })
       .lean()
       .exec();
 
@@ -85,18 +102,22 @@ export class LivestockRepository {
   }
 
   // Update
-  async update(livestockId: string, updateData: UpdateLivestockDto) {
+  async update(
+    farmId: string,
+    livestockId: string,
+    updateData: UpdateLivestockDto,
+  ) {
     return this.livestockModel
-      .findByIdAndUpdate(livestockId, updateData, { new: true })
+      .findOneAndUpdate({ farmId, _id: livestockId }, updateData, { new: true })
       .populate('type', 'name description')
       .lean()
       .exec();
   }
 
   // Delete
-  async delete(livestockId: string) {
+  async delete(farmId: string, livestockId: string) {
     return this.livestockModel
-      .findByIdAndDelete(livestockId)
+      .findByIdAndDelete({ farmId, _id: livestockId })
       .populate('type', 'name description')
       .lean()
       .exec();

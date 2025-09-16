@@ -3,8 +3,11 @@ import { CropService } from './crop.service';
 import { CropController } from './crop.controller';
 import { CropRepository } from './crop.repository';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Crop, CropSchema } from './schema/crop.schema';
-import { CropType, CropTypeSchema } from '../crop-type/schema/crop-type.schema';
+import { Crop, CropSchema } from './schemas/crop.schema';
+import {
+  CropType,
+  CropTypeSchema,
+} from '../crop-type/schemas/crop-type.schema';
 import { CropTypeModule } from '../crop-type/crop-type.module';
 import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
 

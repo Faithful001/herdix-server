@@ -7,16 +7,14 @@ import { EmailModule } from '../email/email.module';
 import { FarmerRepository } from './farmer.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
+import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
 
 @Module({
   imports: [
     UserModule,
     EmailModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'defaultSecret',
-      signOptions: { expiresIn: process.env.JWT_EXPIRATION || '1d' },
-    }),
+    SharedJwtModule,
   ],
   controllers: [FarmerController],
   providers: [FarmerService, FarmerRepository],

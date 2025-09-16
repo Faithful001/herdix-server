@@ -3,6 +3,10 @@ import { IsEmail, IsEnum, IsString, Matches } from 'class-validator';
 import { UserRole } from '../enums/user-role.enum';
 
 export class CreateUserDto {
+  @ApiProperty({ description: 'The farm id', example: '' })
+  @IsString()
+  farmId: string;
+
   @ApiProperty({ description: "The user's first name", example: 'John' })
   @IsString()
   firstName: string;

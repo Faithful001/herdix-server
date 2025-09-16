@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   HttpCode,
+  Req,
 } from '@nestjs/common';
 import { FarmerService } from './farmer.service';
 import { CreateFarmerDto } from './dto/create-farmer.dto';
@@ -21,6 +22,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request } from 'express';
 
 @ApiTags('Farmer')
 @ApiBearerAuth('JWT')
@@ -38,8 +40,8 @@ export class FarmerController {
     description: 'The farmer has been successfully created.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  create(@Body() createFarmerDto: CreateFarmerDto) {
-    return this.farmerService.create(createFarmerDto);
+  create(@Req() request: Request, @Body() createFarmerDto: CreateFarmerDto) {
+    return this.farmerService.create(request, createFarmerDto);
   }
 
   @Get()
@@ -52,8 +54,8 @@ export class FarmerController {
     description: 'The farmers have been successfully found.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  findAll() {
-    return this.farmerService.findAll();
+  findAll(@Req() request: Request) {
+    return this.farmerService.findAll(request);
   }
 
   @HttpCode(200)
@@ -66,8 +68,8 @@ export class FarmerController {
     description: 'The farmer has been successfully found.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  findOne(@Param('id') id: string) {
-    return this.farmerService.findOne(id);
+  findOne(@Req() request: Request, @Param('id') id: string) {
+    return this.farmerService.findOne(request, id);
   }
 
   @UseGuards(RolesGuard)
@@ -80,8 +82,12 @@ export class FarmerController {
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFarmerDto: UpdateFarmerDto) {
-    return this.farmerService.update(id, updateFarmerDto);
+  update(
+    @Req() request: Request,
+    @Param('id') id: string,
+    @Body() updateFarmerDto: UpdateFarmerDto,
+  ) {
+    return this.farmerService.update(request, id, updateFarmerDto);
   }
 
   @Delete(':id')
@@ -94,7 +100,7 @@ export class FarmerController {
     description: 'The farmer has been successfully deleted.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  remove(@Param('id') id: string) {
-    return this.farmerService.delete(id);
+  remove(@Req() request: Request, @Param('id') id: string) {
+    return this.farmerService.delete(request, id);
   }
 }

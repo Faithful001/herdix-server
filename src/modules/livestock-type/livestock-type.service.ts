@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateLivestockTypeDto } from './dto/create-livestock-type.dto';
 import { UpdateLivestockTypeDto } from './dto/update-livestock-type.dto';
 import { LivestockTypeRepository } from './livestock-type.repository';
+import { Request } from 'express';
 
 @Injectable()
 export class LivestockTypeService {
@@ -9,8 +10,13 @@ export class LivestockTypeService {
     private readonly livestockTypeRepository: LivestockTypeRepository,
   ) {}
 
-  async create(createLivestockTypeDto: CreateLivestockTypeDto) {
+  async create(
+    request: Request,
+    createLivestockTypeDto: CreateLivestockTypeDto,
+  ) {
+    const farmId = request.user.farmId;
     const createdLiveStockType = await this.livestockTypeRepository.create(
+      farmId,
       createLivestockTypeDto,
     );
 
@@ -20,16 +26,21 @@ export class LivestockTypeService {
     };
   }
 
-  async findAll() {
-    const livestockTypes = await this.livestockTypeRepository.findAll();
+  async findAll(request: Request) {
+    const farmId = request.user.farmId;
+    const livestockTypes = await this.livestockTypeRepository.findAll(farmId);
     return {
       message: 'Livestock types fetched successfully',
       data: livestockTypes,
     };
   }
 
-  async findOne(id: string) {
-    const livestockType = await this.livestockTypeRepository.findOne(id);
+  async findOne(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const livestockType = await this.livestockTypeRepository.findOne(
+      farmId,
+      id,
+    );
     if (!livestockType) {
       throw new NotFoundException(`Livestock type not found`);
     }
@@ -39,8 +50,12 @@ export class LivestockTypeService {
     };
   }
 
-  async findOneByName(name: string) {
-    const livestockType = await this.livestockTypeRepository.findByName(name);
+  async findOneByName(request: Request, name: string) {
+    const farmId = request.user.farmId;
+    const livestockType = await this.livestockTypeRepository.findByName(
+      farmId,
+      name,
+    );
     if (!livestockType) {
       throw new NotFoundException(`Livestock type not found`);
     }
@@ -50,8 +65,14 @@ export class LivestockTypeService {
     };
   }
 
-  async update(id: string, updateLivestockTypeDto: UpdateLivestockTypeDto) {
+  async update(
+    request: Request,
+    id: string,
+    updateLivestockTypeDto: UpdateLivestockTypeDto,
+  ) {
+    const farmId = request.user.farmId;
     const updatedLivestockType = await this.livestockTypeRepository.update(
+      farmId,
       id,
       updateLivestockTypeDto,
     );
@@ -64,8 +85,12 @@ export class LivestockTypeService {
     };
   }
 
-  async delete(id: string) {
-    const deletedLivestockType = await this.livestockTypeRepository.delete(id);
+  async delete(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const deletedLivestockType = await this.livestockTypeRepository.delete(
+      farmId,
+      id,
+    );
     if (!deletedLivestockType) {
       throw new NotFoundException(`Livestock type not found`);
     }

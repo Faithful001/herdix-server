@@ -3,6 +3,7 @@ import { CreateCropDto, BulkCreateCropDto } from './dto/create-crop.dto';
 import { UpdateCropDto } from './dto/update-crop.dto';
 import { CropRepository } from './crop.repository';
 import { CropTypeRepository } from '../crop-type/crop-type.repository';
+import { Request } from 'express';
 
 @Injectable()
 export class CropService {
@@ -15,11 +16,15 @@ export class CropService {
   ) {}
 
   /** Utility: resolve crop type with caching */
-  private async resolveCropType(typeName: string): Promise<string> {
+  private async resolveCropType(
+    request: Request,
+    typeName: string,
+  ): Promise<string> {
+    const farmId = request.user.farmId;
     if (this.typeCache.has(typeName)) {
       return this.typeCache.get(typeName);
     }
-    const cropType = await this.cropTypeRepository.findByName(typeName);
+    const cropType = await this.cropTypeRepository.findByName(farmId, typeName);
     if (!cropType) throw new Error('Invalid crop type');
 
     const typeId = cropType._id.toString();
@@ -27,9 +32,10 @@ export class CropService {
     return typeId;
   }
 
-  async create(createCropDto: CreateCropDto) {
-    const typeId = await this.resolveCropType(createCropDto.type);
-    const createdCrop = await this.cropRepository.create({
+  async create(request: Request, createCropDto: CreateCropDto) {
+    const farmId = request.user.farmId;
+    const typeId = await this.resolveCropType(request, createCropDto.type);
+    const createdCrop = await this.cropRepository.create(farmId, {
       ...createCropDto,
       type: typeId,
     });
@@ -40,7 +46,8 @@ export class CropService {
     };
   }
 
-  async createMany(createCropDtos: CreateCropDto[]) {
+  async createMany(request: Request, createCropDtos: CreateCropDto[]) {
+    const farmId = request.user.farmId;
     if (!createCropDtos || createCropDtos.length === 0) {
       return {
         message: 'No crop provided',
@@ -49,14 +56,17 @@ export class CropService {
     }
 
     // assume all crop share the same type
-    const typeId = await this.resolveCropType(createCropDtos[0].type);
+    const typeId = await this.resolveCropType(request, createCropDtos[0].type);
 
     const mappedDtos = createCropDtos.map((dto) => ({
       ...dto,
       type: typeId,
     }));
 
-    const createdCrop = await this.cropRepository.createMany(mappedDtos);
+    const createdCrop = await this.cropRepository.createMany(
+      farmId,
+      mappedDtos,
+    );
 
     return {
       message: 'Many crops created successfully',
@@ -64,15 +74,17 @@ export class CropService {
     };
   }
 
-  async createBulk(createCropDto: BulkCreateCropDto) {
-    const typeId = await this.resolveCropType(createCropDto.type);
+  async createBulk(request: Request, createCropDto: BulkCreateCropDto) {
+    const farmId = request.user.farmId;
+
+    const typeId = await this.resolveCropType(request, createCropDto.type);
 
     const bulkDtos = Array.from({ length: createCropDto.quantity }, () => ({
       ...createCropDto,
       type: typeId,
     }));
 
-    const createdCrop = await this.cropRepository.createMany(bulkDtos);
+    const createdCrop = await this.cropRepository.createMany(farmId, bulkDtos);
 
     return {
       message: 'Bulk crops created successfully',
@@ -83,8 +95,9 @@ export class CropService {
     };
   }
 
-  async findAll() {
-    const crop = await this.cropRepository.findAll();
+  async findAll(request: Request) {
+    const farmId = request.user.farmId;
+    const crop = await this.cropRepository.findAll(farmId);
 
     return {
       message: 'Crops fetched successfully',
@@ -92,8 +105,9 @@ export class CropService {
     };
   }
 
-  async findOne(id: string) {
-    const crop = await this.cropRepository.findById(id);
+  async findOne(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const crop = await this.cropRepository.findById(farmId, id);
     if (!crop) {
       throw new NotFoundException(`Crop with id ${id} not found`);
     }
@@ -103,8 +117,9 @@ export class CropService {
     };
   }
 
-  async findManyByType(type: string) {
-    const crop = await this.cropRepository.findManyByCropType(type);
+  async findManyByType(request: Request, type: string) {
+    const farmId = request.user.farmId;
+    const crop = await this.cropRepository.findManyByCropType(farmId, type);
 
     if (!crop || crop.length === 0) {
       throw new NotFoundException(`No crop found for the type ${type}`);
@@ -116,13 +131,21 @@ export class CropService {
     };
   }
 
-  async update(id: string, updateCropDto: UpdateCropDto) {
+  async update(request: Request, id: string, updateCropDto: UpdateCropDto) {
+    const farmId = request.user.farmId;
     // resolve type if being updated
     if (updateCropDto.type) {
-      updateCropDto.type = await this.resolveCropType(updateCropDto.type);
+      updateCropDto.type = await this.resolveCropType(
+        request,
+        updateCropDto.type,
+      );
     }
 
-    const updatedCrop = await this.cropRepository.update(id, updateCropDto);
+    const updatedCrop = await this.cropRepository.update(
+      farmId,
+      id,
+      updateCropDto,
+    );
 
     if (!updatedCrop) {
       throw new NotFoundException(`Crop with id ${id} not found`);
@@ -133,8 +156,9 @@ export class CropService {
     };
   }
 
-  async delete(id: string) {
-    const removedCrop = await this.cropRepository.delete(id);
+  async delete(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const removedCrop = await this.cropRepository.delete(farmId, id);
 
     if (!removedCrop) {
       throw new NotFoundException(`Crop with id ${id} not found`);

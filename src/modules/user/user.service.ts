@@ -86,6 +86,7 @@ export class UserService {
       lastName: user.lastName,
       role: user.role,
       isPasswordChanged: user.isPasswordChanged,
+      farmId: user.farmId,
     };
   }
 }

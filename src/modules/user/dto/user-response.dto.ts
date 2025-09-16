@@ -7,6 +7,10 @@ export class UserResponseDto {
   @IsString()
   _id: string;
 
+  @ApiProperty({ description: 'The farm ID', example: '1234567890abcdef' })
+  @IsString()
+  farmId: string;
+
   @ApiProperty({ description: "The user's first name", example: 'John' })
   @IsString()
   firstName: string;

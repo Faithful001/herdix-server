@@ -1,11 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { UserRole } from '../enums/user-role.enum';
+import { Farm } from 'src/modules/farm/schemas/farm.schema';
 
 export type UserDocument = User & Document;
 
 @Schema({ timestamps: true })
 export class User {
+  @Prop({ required: true, type: String, ref: Farm.name })
+  farmId: string;
+
   @Prop({ required: true })
   firstName: string;
 
