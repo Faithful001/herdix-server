@@ -26,6 +26,7 @@ import { CloudinaryService } from './modules/cloudinary/cloudinary.service';
 import { CropModule } from './modules/crop/crop.module';
 import { CropTypeModule } from './modules/crop-type/crop-type.module';
 import { FarmModule } from './modules/farm/farm.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { FarmModule } from './modules/farm/farm.module';
     CropModule,
     CropTypeModule,
     FarmModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [

@@ -21,6 +21,9 @@
   },
   "dependencies": {
     "@bull-board/express": "^6.12.5",
+    "@google/genai": "^1.20.0",
+    "@huggingface/inference": "^4.8.0",
+    "@nestjs/axios": "^4.0.1",
     "@nestjs/bullmq": "^11.0.3",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^10.0.0",
@@ -46,6 +49,7 @@
     "nodemailer": "^7.0.5",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",
+    "replicate": "^0.25.1",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1"
   },
