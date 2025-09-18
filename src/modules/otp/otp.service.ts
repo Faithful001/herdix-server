@@ -99,6 +99,10 @@ export class OtpService {
 
     const user = await this.userRepository.findUserByEmail(sendOtpDto.email);
 
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
     const hashedOtp = await bcrypt.hash(otp, 10);
 
     const otpDoc = await this.otpRepository.createOtp({
@@ -108,7 +112,7 @@ export class OtpService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found.');
+      throw new NotFoundException('User not found');
     }
 
     // send email

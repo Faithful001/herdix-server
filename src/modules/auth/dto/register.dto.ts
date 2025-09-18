@@ -45,7 +45,7 @@ export class RegisterDto {
   )
   password: string;
 
-  @ApiProperty({ description: "The user's role", example: 'farmer' })
-  @IsEnum(UserRole, { message: 'Invalid role provided' })
-  role: UserRole;
+  // @ApiProperty({ description: "The user's role", example: 'farmer' })
+  // @IsEnum(UserRole, { message: 'Invalid role provided' })
+  // role: UserRole;
 }

@@ -2,11 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateFarmerDto {
-  @ApiProperty({ description: 'The farm id', example: '1234567890abc' })
-  @IsMongoId()
-  @IsNotEmpty({ message: 'Farm id is required' })
-  farmId: string;
-
   @ApiProperty({ description: "The farmer's first name", example: 'John' })
   @IsString()
   @IsNotEmpty({ message: 'First name is required' })

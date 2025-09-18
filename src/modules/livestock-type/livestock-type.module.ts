@@ -7,14 +7,14 @@ import {
   LivestockType,
   LivestockTypeSchema,
 } from './schemas/livestock-type.schema';
-import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: LivestockType.name, schema: LivestockTypeSchema },
     ]),
-    SharedJwtModule,
+    UserModule,
   ],
   controllers: [LivestockTypeController],
   providers: [LivestockTypeService, LivestockTypeRepository],

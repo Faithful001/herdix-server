@@ -1,9 +1,7 @@
 import {
   IsEnum,
   IsInt,
-  IsMongoId,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   Min,
@@ -12,11 +10,6 @@ import { HealthStatus } from '../enums/health-status.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCropDto {
-  @ApiProperty({ description: 'The farm id', example: '1234567890abc' })
-  @IsMongoId()
-  @IsNotEmpty({ message: 'Farm id is required' })
-  farmId: string;
-
   @ApiProperty({
     description: 'Crop type',
     example: 'Corn',

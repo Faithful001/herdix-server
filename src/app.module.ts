@@ -27,6 +27,9 @@ import { CropModule } from './modules/crop/crop.module';
 import { CropTypeModule } from './modules/crop-type/crop-type.module';
 import { FarmModule } from './modules/farm/farm.module';
 import { AiModule } from './modules/ai/ai.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { SharedJwtModule } from './common/modules/shared-jwt.module';
+import { SharedUserModule } from './common/modules/shared-user.module';
 
 @Module({
   imports: [
@@ -61,16 +64,18 @@ import { AiModule } from './modules/ai/ai.module';
       inject: [ConfigService],
     }),
     PassportModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRATION', '1d'),
-        },
-      }),
-    }),
+    SharedJwtModule,
+    SharedUserModule,
+    // JwtModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     secret: configService.get<string>('JWT_SECRET'),
+    //     signOptions: {
+    //       expiresIn: configService.get<string>('JWT_EXPIRATION', '1d'),
+    //     },
+    //   }),
+    // }),
     UserModule,
     AuthModule,
     FarmerModule,
@@ -86,6 +91,7 @@ import { AiModule } from './modules/ai/ai.module';
     CropTypeModule,
     FarmModule,
     AiModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

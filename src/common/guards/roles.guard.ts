@@ -28,7 +28,7 @@ export class RolesGuard implements CanActivate {
 
   constructor(
     private readonly reflector: Reflector,
-    private readonly usersService: UserService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -41,31 +41,44 @@ export class RolesGuard implements CanActivate {
     const req = context
       .switchToHttp()
       .getRequest<Request & { user?: UserResponseDto }>();
+
     const token = this.extractTokenFromHeader(req);
 
     try {
       const payload = (await this.jwtService.verifyAsync(token)) as JwtPayload;
 
+      // Verify token purpose
       if (payload.purpose !== Token.AUTHORIZATION) {
         throw new UnauthorizedException('Invalid token purpose');
       }
 
-      const user = await this.usersService.findById(payload.sub);
+      // Get user
+      const user = await this.userService.findById(payload.sub);
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
 
-      req.user = user;
-
-      if (requiredRoles && requiredRoles.includes(UserRole.ALL)) {
-        return true;
-      }
-
-      if (requiredRoles && !requiredRoles.includes(user.role as UserRole)) {
+      // Handle ALL role
+      if (requiredRoles.includes(UserRole.ALL)) {
+        const allowedRoles = [
+          UserRole.ADMIN,
+          UserRole.MANAGER,
+          UserRole.FARMER,
+        ];
+        if (allowedRoles.includes(user.role as UserRole)) {
+          req.user = user;
+          return true;
+        }
         throw new ForbiddenException('Insufficient role permissions');
       }
 
-      return true;
+      // Check specific role
+      if (requiredRoles.includes(user.role as UserRole)) {
+        req.user = user;
+        return true;
+      }
+
+      throw new ForbiddenException('Insufficient role permissions');
     } catch (error) {
       this.logger.error(`Authentication failed: ${error.message}`, error.stack);
       throw error instanceof ForbiddenException

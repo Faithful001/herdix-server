@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -32,7 +33,7 @@ export class AuthService {
   ) {}
 
   /*
-   * Register a new user
+   * Register a new ADMIN
    * @param createUserDto
    * @returns { UserResponseDto }
    */
@@ -47,7 +48,9 @@ export class AuthService {
     // Check for existing user by email
     const existingUser = await this.userRepository.findUserByEmail(
       createUserDto.email,
+      UserRole.ADMIN,
     );
+
     if (existingUser) {
       throw new ConflictException('Email is already taken');
     }
@@ -57,21 +60,20 @@ export class AuthService {
       createUserDto.password,
     );
 
-    if (createUserDto.role === UserRole.ADMIN) {
-      createUserDto['isPasswordChanged'] = true;
-    }
+    createUserDto['role'] = UserRole.ADMIN;
+    createUserDto['isPasswordChanged'] = true;
     // Create user
     const user = await this.userRepository.createUser({
       ...createUserDto,
       password: hashedPassword,
-    });
+    } as RegisterDto);
 
     const returnedUser = this.toResponseDto(user);
     return returnedUser;
   }
 
   /*
-   * Login a user
+   * Login a user (ADMIN, MANAGER, FARMER)
    * @param loginDto (email, password, role)
    * @returns { user: UserResponseDto; token: string }
    */
@@ -90,6 +92,10 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new BadRequestException('Invalid credentials');
     }
+
+    // if (!user.isPasswordChanged) {
+    //   throw new ForbiddenException('Password must be changed');
+    // }
 
     const returnedUser = this.toResponseDto(user);
     return {

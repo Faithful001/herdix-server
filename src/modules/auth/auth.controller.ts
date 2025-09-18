@@ -30,13 +30,13 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(201)
-  @ApiOperation({ summary: 'Register a user' })
+  @ApiOperation({ summary: 'Register as an admin' })
   @ApiResponse({
     status: 200,
-    description: 'The user has been successfully registered.',
+    description: 'The admin has been successfully registered.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  @CustomMessage('User registered successfully')
+  @CustomMessage('Admin registered successfully')
   create(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }

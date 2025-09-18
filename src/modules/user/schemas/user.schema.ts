@@ -23,6 +23,9 @@ export class User {
   phoneNumber: string;
 
   @Prop({ required: true })
+  address: string;
+
+  @Prop({ required: true })
   password: string;
 
   @Prop({ enum: UserRole, default: UserRole.FARMER })

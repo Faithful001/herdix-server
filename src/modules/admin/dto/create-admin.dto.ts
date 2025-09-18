@@ -1,19 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateManagerDto {
-  @ApiProperty({ description: "The manager's first name", example: 'John' })
+export class CreateAdminDto {
+  @ApiProperty({ description: "The admin's first name", example: 'John' })
   @IsString()
   @IsNotEmpty({ message: 'First name is required' })
   firstName: string;
 
-  @ApiProperty({ description: "The manager's last name", example: 'Doe' })
+  @ApiProperty({ description: "The admin's last name", example: 'Doe' })
   @IsString()
   @IsNotEmpty({ message: 'Last name is required' })
   lastName: string;
 
   @ApiProperty({
-    description: "The manager's email",
+    description: "The admin's email",
     example: 'john.doe@example.com',
   })
   @IsString()
@@ -22,7 +22,16 @@ export class CreateManagerDto {
   email: string;
 
   @ApiProperty({
-    description: "The manager's phone number",
+    description: "The admin's password",
+    example: 'password123',
+  })
+  @IsString()
+  @IsEmail()
+  @IsNotEmpty({ message: 'Password is required' })
+  password: string;
+
+  @ApiProperty({
+    description: "The admin's phone number",
     example: '08012345678',
   })
   @IsString()
@@ -30,7 +39,7 @@ export class CreateManagerDto {
   phoneNumber: string;
 
   @ApiProperty({
-    description: "The manager's address",
+    description: "The admin's address",
     example: '123 Main St',
   })
   @IsString()

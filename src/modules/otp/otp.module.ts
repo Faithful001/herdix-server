@@ -13,23 +13,25 @@ import { EmailService } from '../email/email.service';
 import { UserRepository } from '../user/user.repository';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
+import { User, UserSchema } from '../user/schemas/user.schema';
 
 @Module({
   imports: [
     ConfigModule,
-    MongooseModule.forFeature([{ name: Otp.name, schema: OtpSchema }]),
+    MongooseModule.forFeature([
+      { name: Otp.name, schema: OtpSchema },
+      { name: User.name, schema: UserSchema },
+    ]),
     BullModule.registerQueue({
       name: 'otp-queue',
     }),
     BullModule.registerQueue({
       name: 'email-queue',
     }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'defaultSecret',
-      signOptions: { expiresIn: process.env.JWT_EXPIRATION || '1d' },
-    }),
+    SharedJwtModule,
     EmailModule,
-    forwardRef(() => UserModule),
+    // forwardRef(() => UserModule),
   ],
   controllers: [OtpController],
   providers: [
@@ -37,8 +39,8 @@ import { ConfigModule } from '@nestjs/config';
     OtpProcessor,
     OtpRepository,
     EmailService,
-    // UserRepository,
-    JwtService,
+    UserRepository,
+    // JwtService,
   ],
   exports: [OtpService, OtpRepository],
 })

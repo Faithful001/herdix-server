@@ -13,7 +13,11 @@ export class FarmerRepository {
   ) {}
 
   async create(farmId: string, createFarmerDto: CreateFarmerDto) {
-    return this.userModel.create({ ...createFarmerDto, farmId });
+    return this.userModel.create({
+      ...createFarmerDto,
+      farmId,
+      role: UserRole.FARMER,
+    });
   }
 
   async findAll(farmId: string) {
@@ -21,17 +25,27 @@ export class FarmerRepository {
   }
 
   async findById(farmId: string, id: string) {
-    return this.userModel.findOne({ _id: id, farmId }).lean().exec();
+    return this.userModel
+      .findOne({ _id: id, farmId, role: UserRole.FARMER })
+      .lean()
+      .exec();
   }
 
   async update(farmId: string, id: string, updateFarmerDto: UpdateFarmerDto) {
     return this.userModel
-      .findOneAndUpdate({ _id: id, farmId }, updateFarmerDto, { new: true })
+      .findOneAndUpdate(
+        { _id: id, farmId, role: UserRole.FARMER },
+        updateFarmerDto,
+        { new: true },
+      )
       .lean()
       .exec();
   }
 
   async delete(farmId: string, id: string) {
-    return this.userModel.findOneAndDelete({ _id: id, farmId }).lean().exec();
+    return this.userModel
+      .findOneAndDelete({ _id: id, farmId, role: UserRole.FARMER })
+      .lean()
+      .exec();
   }
 }

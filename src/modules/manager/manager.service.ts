@@ -5,6 +5,7 @@ import { ManagerRepository } from './manager.repository';
 import Password from 'src/common/utils/password.util';
 import { UserRole } from '../user/enums/user-role.enum';
 import { EmailService } from 'src/modules/email/email.service';
+import { Request } from 'express';
 
 @Injectable()
 export class ManagerService {
@@ -13,7 +14,8 @@ export class ManagerService {
     private readonly emailService: EmailService,
   ) {}
 
-  async create(createManagerDto: CreateManagerDto) {
+  async create(request: Request, createManagerDto: CreateManagerDto) {
+    const farmId = request.user.farmId;
     const password = Password.generate();
     createManagerDto['password'] = await Password.hashPassword(password);
     createManagerDto['role'] = UserRole.MANAGER;
@@ -23,42 +25,54 @@ export class ManagerService {
       email: createManagerDto.email,
       name: createManagerDto.firstName,
       subject: 'Welcome to Herdix',
-      message: `Hello ${createManagerDto.firstName}, you have successfully created an account on Herdix. Your temporary password is ${password}`,
+      message: `Hello ${createManagerDto.firstName}, an account has been successfully created for you on Herdix. Your temporary password is ${password}`,
     });
 
-    const manager = await this.managerRepository.create(createManagerDto);
+    await this.managerRepository.create(farmId, createManagerDto);
     return {
       message: 'Manager created successfully',
-      data: manager,
+      data: createManagerDto,
     };
   }
 
-  async findAll() {
-    const managers = await this.managerRepository.findAll();
+  async findAll(request: Request) {
+    const farmId = request.user.farmId;
+    const managers = await this.managerRepository.findAll(farmId);
     return {
       message: 'Managers fetched successfully',
       data: managers,
     };
   }
 
-  async findOne(id: string) {
-    const manager = await this.managerRepository.findById(id);
+  async findOne(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const manager = await this.managerRepository.findById(farmId, id);
     return {
       message: 'Manager fetched successfully',
       data: manager,
     };
   }
 
-  async update(id: string, updateManagerDto: UpdateManagerDto) {
-    const updatedManager = await this.managerRepository.update(id, updateManagerDto);
+  async update(
+    request: Request,
+    id: string,
+    updateManagerDto: UpdateManagerDto,
+  ) {
+    const farmId = request.user.farmId;
+    const updatedManager = await this.managerRepository.update(
+      farmId,
+      id,
+      updateManagerDto,
+    );
     return {
       message: 'Manager updated successfully',
       data: updatedManager,
     };
   }
 
-  async remove(id: string) {
-    const deletedManager = await this.managerRepository.delete(id);
+  async remove(request: Request, id: string) {
+    const farmId = request.user.farmId;
+    const deletedManager = await this.managerRepository.delete(farmId, id);
     return {
       message: 'Manager deleted successfully',
       data: deletedManager,

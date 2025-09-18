@@ -24,7 +24,7 @@ export class FarmerService {
       email: createFarmerDto.email,
       name: createFarmerDto.firstName,
       subject: 'Welcome to Herdix',
-      message: `Hello ${createFarmerDto.firstName}, you have successfully created an account on Herdix. Your temporary password is ${password}`,
+      message: `Hello ${createFarmerDto.firstName}, an account has been successfully created for you on Herdix. Your temporary password is ${password}`,
     });
 
     await this.farmerRepository.create(farmId, createFarmerDto);

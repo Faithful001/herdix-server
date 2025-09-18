@@ -46,7 +46,6 @@ export class OtpRepository {
     return this.otpModel
       .findOne({ userId, purpose })
       .sort({ createdAt: -1 })
-      .lean()
       .exec();
   }
 

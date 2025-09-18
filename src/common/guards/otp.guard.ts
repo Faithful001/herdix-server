@@ -77,9 +77,9 @@ export class OtpGuard implements CanActivate {
 
     request.user = user;
     request.otp = {
-      ...otpDoc.toObject(),
-      _id: otpDoc._id.toString(),
-      userId: otpDoc.userId.toString(),
+      ...otpDoc?.toObject(),
+      _id: otpDoc?._id?.toString(),
+      userId: otpDoc?.userId?.toString(),
     } as OtpResponseDto;
 
     return true;

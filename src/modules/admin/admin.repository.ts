@@ -3,42 +3,45 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../user/schemas/user.schema';
 import { UserRole } from '../user/enums/user-role.enum';
-import { CreateManagerDto } from './dto/create-manager.dto';
-import { UpdateManagerDto } from './dto/update-manager.dto';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { UpdateAdminDto } from './dto/update-admin.dto';
 
 @Injectable()
-export class ManagerRepository {
+export class AdminRepository {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async create(farmId: string, createManagerDto: CreateManagerDto) {
+  async create(farmId: string, createAdminDto: CreateAdminDto) {
     return this.userModel.create({
-      ...createManagerDto,
-      role: UserRole.MANAGER,
+      ...createAdminDto,
+      role: UserRole.ADMIN,
       farmId,
     });
   }
 
   async findAll(farmId: string) {
-    return this.userModel
-      .find({ role: UserRole.MANAGER, farmId })
-      .lean()
-      .exec();
+    return this.userModel.find({ role: UserRole.ADMIN, farmId }).lean().exec();
   }
 
   async findById(farmId: string, id: string) {
     return this.userModel
-      .findOne({ _id: id, farmId, role: UserRole.MANAGER })
+      .findOne({ _id: id, farmId, role: UserRole.ADMIN })
+      .lean()
+      .exec();
+  }
+  async findByEmail(farmId: string, email: string) {
+    return this.userModel
+      .findOne({ email, farmId, role: UserRole.ADMIN })
       .lean()
       .exec();
   }
 
-  async update(farmId: string, id: string, updateManagerDto: UpdateManagerDto) {
+  async update(farmId: string, id: string, updateAdminDto: UpdateAdminDto) {
     return this.userModel
       .findOneAndUpdate(
-        { _id: id, farmId, role: UserRole.MANAGER },
-        updateManagerDto,
+        { _id: id, farmId, role: UserRole.ADMIN },
+        updateAdminDto,
         {
           new: true,
         },
@@ -49,7 +52,7 @@ export class ManagerRepository {
 
   async delete(farmId: string, id: string) {
     return this.userModel
-      .findOneAndDelete({ _id: id, farmId, role: UserRole.MANAGER })
+      .findOneAndDelete({ _id: id, farmId, role: UserRole.ADMIN })
       .lean()
       .exec();
   }

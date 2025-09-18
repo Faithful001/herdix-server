@@ -10,6 +10,7 @@ import {
 } from '../livestock-type/schemas/livestock-type.schema';
 import { LivestockTypeModule } from '../livestock-type/livestock-type.module';
 import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
     MongooseModule.forFeature([
       { name: LivestockType.name, schema: LivestockTypeSchema },
     ]),
-    SharedJwtModule,
+    UserModule,
     LivestockTypeModule,
   ],
   controllers: [LivestockController],

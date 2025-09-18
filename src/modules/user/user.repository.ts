@@ -5,6 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { UserRole } from './enums/user-role.enum';
+import { RegisterDto } from '../auth/dto/register.dto';
 
 @Injectable()
 export class UserRepository {
@@ -12,7 +13,7 @@ export class UserRepository {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserDocument> {
+  async createUser(createUserDto: RegisterDto): Promise<UserDocument> {
     return this.userModel.create(createUserDto);
   }
 
@@ -22,13 +23,25 @@ export class UserRepository {
 
   async findUserByEmail(
     email: string,
-    // role?: UserRole,
+    role?: UserRole,
+    farmId?: string,
   ): Promise<UserDocument | null> {
-    const query = { email };
-    // if (role) {
-    //   query['role'] = role;
-    // }
-    return this.userModel.findOne(query).exec();
+    const baseCondition = { email };
+
+    if (farmId) {
+      baseCondition['farmId'] = farmId;
+    }
+
+    if (role) {
+      return this.userModel
+        .findOne({
+          $or: [baseCondition, { role }],
+        })
+        .exec();
+    }
+
+    // If no role is provided, just farmId && email
+    return this.userModel.findOne(baseCondition).exec();
   }
 
   async findUserById(id: string): Promise<UserDocument | null> {

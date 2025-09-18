@@ -40,8 +40,8 @@ export class ManagerController {
     description: 'The manager has been successfully created.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  create(@Body() createManagerDto: CreateManagerDto) {
-    return this.managerService.create(createManagerDto);
+  create(@Req() request: Request, @Body() createManagerDto: CreateManagerDto) {
+    return this.managerService.create(request, createManagerDto);
   }
 
   @Get()
@@ -53,8 +53,8 @@ export class ManagerController {
     status: 200,
     description: 'List of all managers',
   })
-  findAll() {
-    return this.managerService.findAll();
+  findAll(@Req() request: Request) {
+    return this.managerService.findAll(request);
   }
 
   @Get(':id')
@@ -66,8 +66,8 @@ export class ManagerController {
     description: 'The found manager',
   })
   @ApiResponse({ status: 404, description: 'Manager not found' })
-  findOne(@Param('id') id: string) {
-    return this.managerService.findOne(id);
+  findOne(@Req() request: Request, @Param('id') id: string) {
+    return this.managerService.findOne(request, id);
   }
 
   @Patch(':id')
@@ -80,10 +80,11 @@ export class ManagerController {
   })
   @ApiResponse({ status: 404, description: 'Manager not found' })
   update(
+    @Req() request: Request,
     @Param('id') id: string,
     @Body() updateManagerDto: UpdateManagerDto,
   ) {
-    return this.managerService.update(id, updateManagerDto);
+    return this.managerService.update(request, id, updateManagerDto);
   }
 
   @Delete(':id')
@@ -95,7 +96,7 @@ export class ManagerController {
     description: 'The manager has been successfully deleted.',
   })
   @ApiResponse({ status: 404, description: 'Manager not found' })
-  remove(@Param('id') id: string) {
-    return this.managerService.remove(id);
+  remove(@Req() request: Request, @Param('id') id: string) {
+    return this.managerService.remove(request, id);
   }
 }
