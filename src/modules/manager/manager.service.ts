@@ -28,10 +28,14 @@ export class ManagerService {
       message: `Hello ${createManagerDto.firstName}, an account has been successfully created for you on Herdix. Your temporary password is ${password}`,
     });
 
-    await this.managerRepository.create(farmId, createManagerDto);
+    const { password: _, ...rest } = createManagerDto as CreateManagerDto & {
+      password: string;
+    };
+
+    await this.managerRepository.create(farmId, rest);
     return {
       message: 'Manager created successfully',
-      data: createManagerDto,
+      data: rest,
     };
   }
 
