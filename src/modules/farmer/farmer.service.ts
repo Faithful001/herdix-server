@@ -27,11 +27,11 @@ export class FarmerService {
       message: `Hello ${createFarmerDto.firstName}, an account has been successfully created for you on Herdix. Your temporary password is ${password}`,
     });
 
+    await this.farmerRepository.create(farmId, createFarmerDto);
+
     const { password: _, ...rest } = createFarmerDto as CreateFarmerDto & {
       password: string;
     };
-
-    await this.farmerRepository.create(farmId, rest);
     return {
       message: 'Farmer created successfully',
       data: rest,
