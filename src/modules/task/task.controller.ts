@@ -24,6 +24,7 @@ import {
 import { UserRole } from 'src/common/enums/user-role.enum';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { TaskStatus } from './enums/task-status.enum';
 
 @ApiTags('Tasks')
 @ApiBearerAuth('JWT')
@@ -84,9 +85,9 @@ export class TaskController {
   updateStatus(
     @Req() request: Request,
     @Param('id') id: string,
-    @Query() query: UpdateTaskStatusDto,
+    @Query('status') status: TaskStatus,
   ) {
-    return this.taskService.updateStatus(request, id, query.status);
+    return this.taskService.updateStatus(request, id, status);
   }
 
   @Delete(':id')

@@ -47,7 +47,7 @@ export class TaskService {
       status,
     });
     return {
-      message: 'Task updated successfully',
+      message: `Task status updated to ${status}`,
       data: updatedTask,
     };
   }
