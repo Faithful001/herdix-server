@@ -16,9 +16,6 @@ export class FarmerService {
   async create(request: Request, createFarmerDto: CreateFarmerDto) {
     const farmId = request.user.farmId;
     const password = Password.generate();
-    createFarmerDto['password'] = await Password.hashPassword(password);
-    createFarmerDto['role'] = UserRole.FARMER;
-    createFarmerDto['isPasswordChanged'] = false;
 
     this.emailService.queueEmail({
       email: createFarmerDto.email,

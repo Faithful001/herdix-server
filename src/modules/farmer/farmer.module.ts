@@ -8,12 +8,13 @@ import { FarmerRepository } from './farmer.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
 import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
+import { Farmer, FarmerSchema } from './schemas/farmer.schema';
 
 @Module({
   imports: [
     UserModule,
     EmailModule,
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: Farmer.name, schema: FarmerSchema }]),
     SharedJwtModule,
   ],
   controllers: [FarmerController],

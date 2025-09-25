@@ -1,12 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { UserRole } from '../enums/user-role.enum';
 import { Farm } from 'src/modules/farm/schemas/farm.schema';
 
-export type UserDocument = User & Document;
+export type FarmerDocument = Farmer & Document;
 
 @Schema({ timestamps: true })
-export class User {
+export class Farmer {
   @Prop({ required: true, type: String, ref: Farm.name })
   farmId: string;
 
@@ -30,12 +29,6 @@ export class User {
 
   @Prop({ required: false, default: null })
   profileImage: string;
-
-  @Prop({ enum: UserRole, default: UserRole.MANAGER })
-  role: UserRole;
-
-  @Prop({ default: false })
-  isPasswordChanged: boolean;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const FarmerSchema = SchemaFactory.createForClass(Farmer);

@@ -60,11 +60,7 @@ export class RolesGuard implements CanActivate {
 
       // Handle ALL role
       if (requiredRoles.includes(UserRole.ALL)) {
-        const allowedRoles = [
-          UserRole.ADMIN,
-          UserRole.MANAGER,
-          UserRole.FARMER,
-        ];
+        const allowedRoles = [UserRole.ADMIN, UserRole.MANAGER];
         if (allowedRoles.includes(user.role as UserRole)) {
           req.user = user;
           return true;

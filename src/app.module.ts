@@ -30,6 +30,7 @@ import { AiModule } from './modules/ai/ai.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { SharedJwtModule } from './common/modules/shared-jwt.module';
 import { SharedUserModule } from './common/modules/shared-user.module';
+import { TaskModule } from './modules/task/task.module';
 
 @Module({
   imports: [
@@ -92,6 +93,7 @@ import { SharedUserModule } from './common/modules/shared-user.module';
     FarmModule,
     AiModule,
     AdminModule,
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [

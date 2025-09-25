@@ -5,47 +5,38 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from '../user/schemas/user.schema';
 import { UserRole } from '../user/enums/user-role.enum';
 import { UpdateFarmerDto } from './dto/update-farmer.dto';
+import { Farmer, FarmerDocument } from './schemas/farmer.schema';
 
 @Injectable()
 export class FarmerRepository {
   constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(Farmer.name)
+    private readonly farmerModel: Model<FarmerDocument>,
   ) {}
 
   async create(farmId: string, createFarmerDto: CreateFarmerDto) {
-    return this.userModel.create({
+    return this.farmerModel.create({
       ...createFarmerDto,
       farmId,
-      role: UserRole.FARMER,
     });
   }
 
   async findAll(farmId: string) {
-    return this.userModel.find({ role: UserRole.FARMER, farmId }).lean().exec();
+    return this.farmerModel.find({ farmId }).lean().exec();
   }
 
   async findById(farmId: string, id: string) {
-    return this.userModel
-      .findOne({ _id: id, farmId, role: UserRole.FARMER })
-      .lean()
-      .exec();
+    return this.farmerModel.findOne({ _id: id, farmId }).lean().exec();
   }
 
   async update(farmId: string, id: string, updateFarmerDto: UpdateFarmerDto) {
-    return this.userModel
-      .findOneAndUpdate(
-        { _id: id, farmId, role: UserRole.FARMER },
-        updateFarmerDto,
-        { new: true },
-      )
+    return this.farmerModel
+      .findOneAndUpdate({ _id: id, farmId }, updateFarmerDto, { new: true })
       .lean()
       .exec();
   }
 
   async delete(farmId: string, id: string) {
-    return this.userModel
-      .findOneAndDelete({ _id: id, farmId, role: UserRole.FARMER })
-      .lean()
-      .exec();
+    return this.farmerModel.findOneAndDelete({ _id: id, farmId }).lean().exec();
   }
 }

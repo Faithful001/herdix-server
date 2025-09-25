@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateAdminDto {
   @ApiProperty({ description: "The admin's first name", example: 'John' })
@@ -45,4 +45,12 @@ export class CreateAdminDto {
   @IsString()
   @IsNotEmpty({ message: 'Address is required' })
   address: string;
+
+  @ApiProperty({
+    description: "The user's profile image",
+    example: 'profile-image.jpg',
+  })
+  @IsString()
+  @IsOptional()
+  profileImage: string;
 }

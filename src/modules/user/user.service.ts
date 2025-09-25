@@ -9,16 +9,6 @@ import { UserDocument } from './schemas/user.schema';
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async findAllFarmers(): Promise<UserResponseDto[]> {
-    const users = await this.userRepository.findAllUsers(UserRole.FARMER);
-    if (!users) {
-      throw new NotFoundException(`User not found`);
-    }
-
-    const farmerUsers = users.map((user) => this.toResponseDto(user));
-    return farmerUsers;
-  }
-
   async findAllManagers(): Promise<UserResponseDto[]> {
     const users = await this.userRepository.findAllUsers(UserRole.MANAGER);
     if (!users) {

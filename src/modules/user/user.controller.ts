@@ -46,21 +46,6 @@ export class UserController {
   }
 
   @UseGuards(RolesGuard)
-  @ApiOperation({ summary: 'Find all farmers' })
-  @ApiResponse({
-    status: 200,
-    description: 'The farmers have been successfully found.',
-  })
-  @ApiResponse({ status: 400, description: 'Bad Request.' })
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
-  @HttpCode(200)
-  @CustomMessage('Farmers retrieved successfully')
-  @Get('farmers')
-  findAllFarmers() {
-    return this.usersService.findAllFarmers();
-  }
-
-  @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Find all managers' })
   @ApiResponse({
     status: 200,

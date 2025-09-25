@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsMongoId, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateManagerDto {
   @ApiProperty({ description: "The manager's first name", example: 'John' })
@@ -36,4 +42,12 @@ export class CreateManagerDto {
   @IsString()
   @IsNotEmpty({ message: 'Address is required' })
   address: string;
+
+  @ApiProperty({
+    description: "The user's profile image",
+    example: 'profile-image.jpg',
+  })
+  @IsString()
+  @IsOptional()
+  profileImage: string;
 }
