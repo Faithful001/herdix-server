@@ -15,17 +15,11 @@ export class Farmer {
   @Prop({ required: true })
   lastName: string;
 
-  @Prop({ required: true, unique: true })
-  email: string;
-
   @Prop({ required: true })
   phoneNumber: string;
 
   @Prop({ required: true })
   address: string;
-
-  @Prop({ required: true })
-  password: string;
 
   @Prop({ required: false, default: null })
   profileImage: string;

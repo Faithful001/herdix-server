@@ -13,8 +13,8 @@ import {
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { Request } from 'express';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
+import { Request } from 'express';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -79,15 +79,15 @@ export class TaskController {
   @Patch('update-status/:id')
   @ApiResponse({ status: 201, description: 'Task status updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
-  @ApiOperation({ summary: 'Update tasks status' })
+  @ApiOperation({ summary: 'Update task status' })
   @UseGuards(RolesGuard)
   @Roles(UserRole.ALL)
   updateStatus(
     @Req() request: Request,
     @Param('id') id: string,
-    @Query('status') status: TaskStatus,
+    @Body() updateTaskStatusDto: UpdateTaskStatusDto,
   ) {
-    return this.taskService.updateStatus(request, id, status);
+    return this.taskService.updateStatus(request, id, updateTaskStatusDto);
   }
 
   @Delete(':id')

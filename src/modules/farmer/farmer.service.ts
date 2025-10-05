@@ -2,36 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { CreateFarmerDto } from './dto/create-farmer.dto';
 import { UpdateFarmerDto } from './dto/update-farmer.dto';
 import { FarmerRepository } from './farmer.repository';
-import Password from 'src/common/utils/password.util';
-import { UserRole } from '../user/enums/user-role.enum';
-import { EmailService } from 'src/modules/email/email.service';
 import { Request } from 'express';
 
 @Injectable()
 export class FarmerService {
-  constructor(
-    private readonly farmerRepository: FarmerRepository,
-    private readonly emailService: EmailService,
-  ) {}
+  constructor(private readonly farmerRepository: FarmerRepository) {}
   async create(request: Request, createFarmerDto: CreateFarmerDto) {
     const farmId = request.user.farmId;
-    const password = Password.generate();
-
-    this.emailService.queueEmail({
-      email: createFarmerDto.email,
-      name: createFarmerDto.firstName,
-      subject: 'Welcome to Herdix',
-      message: `Hello ${createFarmerDto.firstName}, an account has been successfully created for you on Herdix. Your temporary password is ${password}`,
-    });
-
-    await this.farmerRepository.create(farmId, createFarmerDto);
-
-    const { password: _, ...rest } = createFarmerDto as CreateFarmerDto & {
-      password: string;
-    };
+    const createdFarmer = await this.farmerRepository.create(
+      farmId,
+      createFarmerDto,
+    );
     return {
       message: 'Farmer created successfully',
-      data: rest,
+      data: createdFarmer,
     };
   }
 

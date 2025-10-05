@@ -4,6 +4,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { Request } from 'express';
 import { TaskRepository } from './task.repository';
 import { TaskStatus } from './enums/task-status.enum';
+import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 
 @Injectable()
 export class TaskService {
@@ -41,13 +42,19 @@ export class TaskService {
     };
   }
 
-  async updateStatus(request: Request, id: string, status: TaskStatus) {
+  async updateStatus(
+    request: Request,
+    id: string,
+    updateTaskStatusDto: UpdateTaskStatusDto,
+  ) {
     const { farmId } = request.user;
-    const updatedTask = await this.taskRepository.updateTask(farmId, id, {
-      status,
-    });
+    const updatedTask = await this.taskRepository.updateTaskStatus(
+      farmId,
+      id,
+      updateTaskStatusDto,
+    );
     return {
-      message: `Task status updated to ${status}`,
+      message: `Task status updated to ${updateTaskStatusDto.status}`,
       data: updatedTask,
     };
   }

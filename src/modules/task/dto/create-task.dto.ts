@@ -1,5 +1,5 @@
 import {
-  IsDate,
+  IsArray,
   IsEnum,
   IsISO8601,
   IsMongoId,
@@ -28,10 +28,10 @@ export class CreateTaskDto {
   farmId: string;
 
   @ApiProperty({
-    example: '1234567890abc',
-    description: 'ID of the worker this task was given to',
+    example: '[Sam, Melody]',
+    description: 'workers this task was given to',
   })
-  @IsMongoId({ message: 'Assigned To must be a valid id' })
+  @IsArray({ message: '' })
   assignedTo: string[];
 
   @ApiProperty({ example: 'High', description: 'Priority level of the tasks' })

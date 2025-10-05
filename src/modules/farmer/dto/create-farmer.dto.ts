@@ -19,15 +19,6 @@ export class CreateFarmerDto {
   lastName: string;
 
   @ApiProperty({
-    description: "The farmer's email",
-    example: 'john.doe@example.com',
-  })
-  @IsString()
-  @IsEmail()
-  @IsNotEmpty({ message: 'Email is required' })
-  email: string;
-
-  @ApiProperty({
     description: "The farmer's phoneNumber",
     example: '08012345678',
   })
@@ -49,5 +40,5 @@ export class CreateFarmerDto {
   })
   @IsString()
   @IsOptional()
-  profileImage: string;
+  profileImage?: string;
 }
