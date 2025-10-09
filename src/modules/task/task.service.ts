@@ -3,7 +3,6 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Request } from 'express';
 import { TaskRepository } from './task.repository';
-import { TaskStatus } from './enums/task-status.enum';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 
 @Injectable()

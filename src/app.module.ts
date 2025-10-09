@@ -31,6 +31,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { SharedJwtModule } from './common/modules/shared-jwt.module';
 import { SharedUserModule } from './common/modules/shared-user.module';
 import { TaskModule } from './modules/task/task.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 
 @Module({
   imports: [
@@ -94,6 +95,7 @@ import { TaskModule } from './modules/task/task.module';
     AiModule,
     AdminModule,
     TaskModule,
+    InventoryModule,
   ],
   controllers: [AppController],
   providers: [
