@@ -22,6 +22,7 @@ import { UserModule } from '../user/user.module';
     ]),
     UserModule,
     LivestockTypeModule,
+    SharedJwtModule,
   ],
   controllers: [LivestockController],
   providers: [LivestockService, LivestockRepository],
