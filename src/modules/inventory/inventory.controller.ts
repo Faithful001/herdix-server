@@ -23,7 +23,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
-@ApiTags('Tasks')
+@ApiTags('Inventory')
 @ApiBearerAuth('JWT')
 @Controller('inventory')
 export class InventoryController {
