@@ -12,10 +12,9 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { FarmerModule } from './modules/farmer/farmer.module';
 import { EmailModule } from './modules/email/email.module';
 import { QueueModule } from './modules/queue/queue.module';
-import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-ioredis';
+// import { CacheModule } from './common/modules/cache.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
 import { OtpModule } from './modules/otp/otp.module';
 import { ManagerModule } from './modules/manager/manager.module';
 import { LivestockModule } from './modules/livestock/livestock.module';
@@ -32,6 +31,9 @@ import { SharedJwtModule } from './common/modules/shared-jwt.module';
 import { SharedUserModule } from './common/modules/shared-user.module';
 import { TaskModule } from './modules/task/task.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
+import { RateLimitGuard } from './common/guards/rate-limit.guard';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -39,15 +41,48 @@ import { InventoryModule } from './modules/inventory/inventory.module';
       isGlobal: true,
       envFilePath: '.env',
       validate: (config: Record<string, any>) => {
-        if (!config.MONGODB_URI) {
-          throw new Error('MONGODB_URI is not defined in .env file');
+        const requiredEnvVars = [
+          'MONGODB_URI',
+          'JWT_SECRET',
+          'REDIS_HOST',
+          'REDIS_PORT',
+        ];
+
+        const missingVars = requiredEnvVars.filter(
+          (varName) => !config[varName],
+        );
+        if (missingVars.length > 0) {
+          throw new Error(
+            `Missing required environment variables: ${missingVars.join(', ')}`,
+          );
         }
-        if (!config.JWT_SECRET) {
-          throw new Error('JWT_SECRET is not defined in .env file');
-        }
-        return config;
+
+        return {
+          ...config,
+          REDIS_PORT: parseInt(config.REDIS_PORT, 10),
+          RATE_LIMIT_TTL: config.RATE_LIMIT_TTL
+            ? parseInt(config.RATE_LIMIT_TTL, 10)
+            : 60,
+          RATE_LIMIT_COUNT: config.RATE_LIMIT_COUNT
+            ? parseInt(config.RATE_LIMIT_COUNT, 10)
+            : 100,
+          CACHE_TTL: config.CACHE_TTL ? parseInt(config.CACHE_TTL, 10) : 300, // 5 minutes default
+          CACHE_MAX_ITEMS: config.CACHE_MAX_ITEMS
+            ? parseInt(config.CACHE_MAX_ITEMS, 10)
+            : 1000,
+        };
       },
     }),
+
+    // Rate limiting and caching
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60,
+        limit: 100,
+      },
+    ]),
+    // CacheModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -115,6 +150,10 @@ import { InventoryModule } from './modules/inventory/inventory.module';
     {
       provide: 'FileStorage', // token for DI
       useClass: CloudinaryService,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RateLimitGuard,
     },
   ],
 })

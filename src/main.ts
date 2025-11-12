@@ -5,6 +5,8 @@ import { ValidationPipe } from '@nestjs/common';
 // import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { config } from 'dotenv';
+import { RateLimitGuard } from './common/guards/rate-limit.guard';
+import { Reflector } from '@nestjs/core';
 config();
 
 async function bootstrap() {
@@ -13,6 +15,14 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   // app.useGlobalFilters(new HttpExceptionFilter());
   // app.useGlobalInterceptors(new ResponseInterceptor());
+
+  app.useGlobalGuards(
+    new RateLimitGuard(
+      app.get(Reflector),
+      app.get('ThrottlerStorageService'),
+      app.get('ThrottlerModuleOptions'),
+    ),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Herdix API')
