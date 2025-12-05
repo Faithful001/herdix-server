@@ -35,11 +35,11 @@ export class OtpRepository {
   }
 
   async findOtpById(otpId: string): Promise<OtpDocument | null> {
-    return this.otpModel.findOne({ _id: otpId }).lean().exec();
+    return this.otpModel.findOne({ _id: otpId }).exec();
   }
 
   async findOtpByUserId(userId: string): Promise<OtpDocument | null> {
-    return this.otpModel.findOne({ userId }).lean().exec();
+    return this.otpModel.findOne({ userId }).exec();
   }
 
   async findLatestOtp(userId: string, purpose: string) {
@@ -60,7 +60,6 @@ export class OtpRepository {
         updateOtpDto,
         { new: true },
       )
-      .lean()
       .exec();
   }
 
@@ -76,12 +75,11 @@ export class OtpRepository {
         { status },
         { new: true },
       )
-      .lean()
       .exec();
   }
 
   async deleteOtpById(otpId: string): Promise<OtpDocument | null> {
-    return this.otpModel.findByIdAndDelete(otpId).lean().exec();
+    return this.otpModel.findByIdAndDelete(otpId).exec();
   }
 
   async deleteOtp(
@@ -91,7 +89,6 @@ export class OtpRepository {
   ): Promise<OtpDocument | null> {
     return this.otpModel
       .findOneAndDelete({ _id: otpId, userId, purpose })
-      .lean()
       .exec();
   }
 }

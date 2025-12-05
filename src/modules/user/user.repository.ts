@@ -18,7 +18,7 @@ export class UserRepository {
   }
 
   async findAllUsers(role: UserRole): Promise<UserDocument[]> {
-    return this.userModel.find({ role }).lean().exec();
+    return this.userModel.find({ role }).exec();
   }
 
   async findUserByEmail(
@@ -54,11 +54,10 @@ export class UserRepository {
   ): Promise<UserDocument | null> {
     return this.userModel
       .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .lean()
       .exec();
   }
 
   async deleteUser(id: string): Promise<UserDocument | null> {
-    return this.userModel.findByIdAndDelete(id).lean().exec();
+    return this.userModel.findByIdAndDelete(id).exec();
   }
 }

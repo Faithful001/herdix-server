@@ -6,8 +6,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AiService } from './ai.service';
+import { AgentService } from './agent.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadedFile } from '@nestjs/common';
+import { UploadedFile, Body } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -24,7 +25,10 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('ai')
 @ApiTags('AI')
 export class AiController {
-  constructor(private readonly aiService: AiService) {}
+  constructor(
+    private readonly aiService: AiService,
+    private readonly agentService: AgentService,
+  ) {}
 
   @Post('detect-crop-health')
   @ApiOperation({ summary: 'Detect crop health' })
@@ -82,5 +86,44 @@ export class AiController {
     }
     const image = file.buffer.toString('base64');
     return this.aiService.detectLivestockHealth(image);
+  }
+
+  @Post('agent/chat')
+  @ApiOperation({ summary: 'Chat with the Farm Assistant Agent' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+        },
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['message'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Agent response',
+  })
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ALL)
+  @UseInterceptors(FileInterceptor('file'))
+  async chat(
+    @Body('message') message: string,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    if (!message) {
+      throw new BadRequestException('Message is required');
+    }
+    let image: string | undefined;
+    if (file) {
+      image = file.buffer.toString('base64');
+    }
+    return this.agentService.chat(message, image);
   }
 }

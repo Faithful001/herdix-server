@@ -12,7 +12,7 @@ import { OtpModule } from '../otp/otp.module';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'defaultSecret',
-      signOptions: { expiresIn: process.env.JWT_EXPIRATION || '1d' },
+      signOptions: { expiresIn: (process.env.JWT_EXPIRATION || '1d') as any },
     }),
     forwardRef(() => OtpModule),
   ],
