@@ -51,7 +51,11 @@ export class InventoryController {
   @ApiOperation({ summary: 'Fetch all inventories' })
   async findAllInventory(@Req() request: Request) {
     const { farmId } = request.user;
-    return this.inventoryService.findAllInventory(farmId);
+    const inventories = this.inventoryService.findAllInventory(farmId);
+    return {
+      message: 'Inventories fetched successfully',
+      data: inventories,
+    };
   }
 
   @Get(':id')

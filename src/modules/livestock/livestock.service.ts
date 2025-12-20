@@ -7,15 +7,16 @@ import { UpdateLivestockDto } from './dto/update-livestock.dto';
 import { LivestockRepository } from './livestock.repository';
 import { LivestockTypeRepository } from '../livestock-type/livestock-type.repository';
 import { Request } from 'express';
+import { CacheService } from 'src/common/services/cache.service';
 
 @Injectable()
 export class LivestockService {
   // {name: id}
-  private typeCache = new Map<string, string>(); // cache for livestock types
 
   constructor(
     private readonly livestockRepository: LivestockRepository,
     private readonly livestockTypeRepository: LivestockTypeRepository,
+    private readonly cacheService: CacheService,
   ) {}
 
   /** Utility: resolve livestock type with caching */
@@ -23,8 +24,10 @@ export class LivestockService {
     farmId: string,
     typeName: string,
   ): Promise<string> {
-    if (this.typeCache.has(typeName)) {
-      return this.typeCache.get(typeName);
+    if (this.cacheService.get('livestock-type-' + farmId + '-' + typeName)) {
+      return await this.cacheService.get(
+        'livestock-type-' + farmId + '-' + typeName,
+      );
     }
     const livestockType = await this.livestockTypeRepository.findByName(
       farmId,
@@ -33,7 +36,10 @@ export class LivestockService {
     if (!livestockType) throw new Error('Invalid livestock type');
 
     const typeId = livestockType._id.toString();
-    this.typeCache.set(typeName, typeId);
+    await this.cacheService.set(
+      'livestock-type-' + farmId + '-' + typeName,
+      typeId,
+    );
     return typeId;
   }
 

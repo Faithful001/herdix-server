@@ -12,7 +12,6 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 import { FarmerModule } from './modules/farmer/farmer.module';
 import { EmailModule } from './modules/email/email.module';
 import { QueueModule } from './modules/queue/queue.module';
-// import { CacheModule } from './common/modules/cache.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { PassportModule } from '@nestjs/passport';
 import { OtpModule } from './modules/otp/otp.module';
@@ -32,8 +31,9 @@ import { SharedUserModule } from './common/modules/shared-user.module';
 import { TaskModule } from './modules/task/task.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
-import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
+import { EventsGateway } from './modules/websocket/gateway/events.gateway';
+import { CacheModule } from './modules/cache/cache.module';
 
 @Module({
   imports: [
@@ -82,7 +82,7 @@ import { redisStore } from 'cache-manager-redis-store';
         limit: 100,
       },
     ]),
-    // CacheModule,
+    CacheModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -90,16 +90,16 @@ import { redisStore } from 'cache-manager-redis-store';
       }),
       inject: [ConfigService],
     }),
-    CacheModule.registerAsync({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        url: configService.get<string>('REDIS_URL'),
-        ttl: 30 * 60, // 30 minutes (seconds)
-      }),
-      inject: [ConfigService],
-    }),
+    // CacheModule.registerAsync({
+    //   isGlobal: true,
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     store: redisStore,
+    //     url: configService.get<string>('REDIS_URL'),
+    //     ttl: 30 * 60, // 30 minutes (seconds)
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     PassportModule,
     SharedJwtModule,
     SharedUserModule,
@@ -134,6 +134,7 @@ import { redisStore } from 'cache-manager-redis-store';
   ],
   controllers: [AppController],
   providers: [
+    EventsGateway,
     AppService,
     {
       provide: APP_FILTER,

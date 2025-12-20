@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InventoryRepository } from './inventory.repository';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class InventoryService {
-  constructor(private readonly inventoryRepository: InventoryRepository) {}
+  constructor(
+    private readonly inventoryRepository: InventoryRepository,
+    private readonly cacheService: CacheService,
+  ) {}
 
   async createInventory(
     farmId: string,
@@ -24,11 +28,13 @@ export class InventoryService {
   }
 
   async findAllInventory(farmId: string) {
+    if (this.cacheService.get(`inventories_${farmId}`)) {
+      return await this.cacheService.get(`inventories_${farmId}`);
+    }
+
     const inventories = await this.inventoryRepository.findAllInventory(farmId);
-    return {
-      message: 'Inventories fetched successfully',
-      data: inventories,
-    };
+    await this.cacheService.set(`inventories_${farmId}`, inventories);
+    return inventories;
   }
 
   async findOneInventory(farmId: string, id: string) {

@@ -1,18 +1,18 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCropDto, BulkCreateCropDto } from './dto/create-crop.dto';
 import { UpdateCropDto } from './dto/update-crop.dto';
 import { CropRepository } from './crop.repository';
 import { CropTypeRepository } from '../crop-type/crop-type.repository';
 import { Request } from 'express';
+import { CacheService } from 'src/common/services/cache.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class CropService {
-  // {name: id}
-  private typeCache = new Map<string, string>(); // cache for livestock types
-
   constructor(
     private readonly cropRepository: CropRepository,
     private readonly cropTypeRepository: CropTypeRepository,
+    private readonly cacheService: CacheService,
   ) {}
 
   /** Utility: resolve crop type with caching */
@@ -21,14 +21,17 @@ export class CropService {
     typeName: string,
   ): Promise<string> {
     const farmId = request.user.farmId;
-    if (this.typeCache.has(typeName)) {
-      return this.typeCache.get(typeName);
+    // check redis cache first
+    if (this.cacheService.get('crop-type-' + farmId + '-' + typeName)) {
+      return await this.cacheService.get(
+        'crop-type-' + farmId + '-' + typeName,
+      );
     }
     const cropType = await this.cropTypeRepository.findByName(farmId, typeName);
     if (!cropType) throw new Error('Invalid crop type');
 
     const typeId = cropType._id.toString();
-    this.typeCache.set(typeName, typeId);
+    await this.cacheService.set('crop-type-' + farmId + '-' + typeName, typeId);
     return typeId;
   }
 
