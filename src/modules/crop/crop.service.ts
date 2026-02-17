@@ -4,7 +4,7 @@ import { UpdateCropDto } from './dto/update-crop.dto';
 import { CropRepository } from './crop.repository';
 import { CropTypeRepository } from '../crop-type/crop-type.repository';
 import { Request } from 'express';
-import { CacheService } from 'src/common/services/cache.service';
+import { CacheService } from '../cache/cache.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()

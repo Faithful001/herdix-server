@@ -7,7 +7,7 @@ import { UpdateLivestockDto } from './dto/update-livestock.dto';
 import { LivestockRepository } from './livestock.repository';
 import { LivestockTypeRepository } from '../livestock-type/livestock-type.repository';
 import { Request } from 'express';
-import { CacheService } from 'src/common/services/cache.service';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class LivestockService {

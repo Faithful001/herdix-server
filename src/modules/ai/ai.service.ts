@@ -2,17 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HealthStatus as CropHealthStatus } from '../crop/enums/health-status.enum';
 import { HealthStatus as LivestockHealthStatus } from '../livestock/enums/health-status.enum';
-import { GoogleGenAI } from '@google/genai';
+// import { GoogleGenAI } from '@google/genai';
 
 @Injectable()
 export class AiService {
-  private ai: GoogleGenAI;
+  private ai: any;
 
   constructor(private readonly configService: ConfigService) {
     const apiKey = this.configService.get<string>('GOOGLE_API_KEY');
     if (!apiKey) {
       throw new Error('GOOGLE_API_KEY is not configured');
     }
+    this.initAi(apiKey);
+  }
+
+  private async initAi(apiKey: string) {
+    const { GoogleGenAI } = await import('@google/genai');
     this.ai = new GoogleGenAI({ apiKey });
   }
 

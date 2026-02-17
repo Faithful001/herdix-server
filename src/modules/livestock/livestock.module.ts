@@ -10,6 +10,7 @@ import {
 } from '../livestock-type/schemas/livestock-type.schema';
 import { LivestockTypeModule } from '../livestock-type/livestock-type.module';
 import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
+import { CacheModule } from '../cache/cache.module';
 import { UserModule } from '../user/user.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { UserModule } from '../user/user.module';
     UserModule,
     LivestockTypeModule,
     SharedJwtModule,
+    CacheModule,
   ],
   controllers: [LivestockController],
   providers: [LivestockService, LivestockRepository],

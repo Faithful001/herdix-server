@@ -10,6 +10,7 @@ import {
 } from '../crop-type/schemas/crop-type.schema';
 import { CropTypeModule } from '../crop-type/crop-type.module';
 import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
+import { CacheModule } from '../cache/cache.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { SharedJwtModule } from 'src/common/modules/shared-jwt.module';
     ]),
     SharedJwtModule,
     CropTypeModule,
+    CacheModule,
   ],
   controllers: [CropController],
   providers: [CropService, CropRepository],
