@@ -90,29 +90,9 @@ import { CacheModule } from './modules/cache/cache.module';
       }),
       inject: [ConfigService],
     }),
-    // CacheModule.registerAsync({
-    //   isGlobal: true,
-    //   imports: [ConfigModule],
-    //   useFactory: async (configService: ConfigService) => ({
-    //     store: redisStore,
-    //     url: configService.get<string>('REDIS_URL'),
-    //     ttl: 30 * 60, // 30 minutes (seconds)
-    //   }),
-    //   inject: [ConfigService],
-    // }),
     PassportModule,
     SharedJwtModule,
     SharedUserModule,
-    // JwtModule.registerAsync({
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: async (configService: ConfigService) => ({
-    //     secret: configService.get<string>('JWT_SECRET'),
-    //     signOptions: {
-    //       expiresIn: configService.get<string>('JWT_EXPIRATION', '1d'),
-    //     },
-    //   }),
-    // }),
     UserModule,
     AuthModule,
     FarmerModule,
