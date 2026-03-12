@@ -1,4 +1,3 @@
-// rate-limit.decorator.ts
 import { SetMetadata } from '@nestjs/common';
 import { ExecutionContext } from '@nestjs/common';
 
