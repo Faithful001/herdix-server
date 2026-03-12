@@ -91,12 +91,4 @@ export class RolesGuard implements CanActivate {
 
     return authorization.split(' ')[1];
   }
-
-  // private extractTokenFromHeader(req: Request): string {
-  //   const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-  //   if (!token) {
-  //     throw new UnauthorizedException('Bearer token required');
-  //   }
-  //   return token;
-  // }
 }
