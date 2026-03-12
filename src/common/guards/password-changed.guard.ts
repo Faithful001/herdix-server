@@ -31,7 +31,6 @@ export class PasswordChangedGuard implements CanActivate {
       .switchToHttp()
       .getRequest<Request & { user?: UserResponseDto }>();
 
-    // Skip guard for excluded paths
     if (
       this.excludedPaths.some((path) =>
         request.path.startsWith(`${'/api/v1' + path}`),
