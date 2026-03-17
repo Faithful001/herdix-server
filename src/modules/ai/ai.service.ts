@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HealthStatus as CropHealthStatus } from '../crop/enums/health-status.enum';
 import { HealthStatus as LivestockHealthStatus } from '../livestock/enums/health-status.enum';
-// import { GoogleGenAI } from '@google/genai';
 
 @Injectable()
 export class AiService {
