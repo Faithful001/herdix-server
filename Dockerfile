@@ -1,7 +1,3 @@
-
-
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
 ARG NODE_VERSION=20.19.2
 
 ################################################################################
