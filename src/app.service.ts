@@ -3,6 +3,6 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AppService {
   getHealth(): string {
-    return "I'm alive!";
+    return "I'm alive, up and running!";
   }
 }
