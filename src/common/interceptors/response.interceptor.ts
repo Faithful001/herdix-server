@@ -13,7 +13,7 @@ import { CUSTOM_STATUS_KEY } from '../decorators/custom-status.decorator';
 
 @Injectable()
 export class ResponseInterceptor<T>
-  implements NestInterceptor<T, ApiResponse<T>>
+  implements NestInterceptor<T, ApiResponse<T
 {
   constructor(private readonly reflector: Reflector) {}
 
