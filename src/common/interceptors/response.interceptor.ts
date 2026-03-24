@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiResponse } from '../types/api-response.type';
 import { CUSTOM_MESSAGE_KEY } from '../decorators/custom-message.decorator';
-import { CUSTOM_STATUS_KEY } from '../decorators/custom-status.decorato';
+import { CUSTOM_STATUS_KEY } from '../decorators/custom-status.decorat';
 
 @Injectable()
 export class ResponseInterceptor<T>
